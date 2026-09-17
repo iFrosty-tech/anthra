@@ -2,7 +2,8 @@ name: winget
 
 # A published release opens a pull request on microsoft/winget-pkgs with the
 # new installer. The first version of iFrosty-tech.Anthra is submitted by hand
-# (`wingetcreate new`); this workflow only updates it.
+# (`wingetcreate new`); until it is merged, and while WINGET_TOKEN is not set,
+# this workflow only leaves a notice.
 #
 # WINGET_TOKEN is a classic PAT with the public_repo scope, able to push to the
 # account's fork of winget-pkgs. It lives in the `winget` environment, so no
@@ -28,17 +29,29 @@ jobs:
     environment: winget
     env:
       TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      PACKAGE_ID: iFrosty-tech.Anthra
     steps:
       - name: Submit to winget-pkgs
         env:
           WINGET_TOKEN: ${{ secrets.WINGET_TOKEN }}
         run: |
           if ($env:TAG -notmatch '^v\d+\.\d+\.\d+$') { throw "not a release tag: $env:TAG" }
+          if (-not $env:WINGET_TOKEN) {
+            Write-Output "::notice::WINGET_TOKEN is not set: skipping the winget submission"
+            exit 0
+          }
+          $manifests = "https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests/i/iFrosty-tech/Anthra"
+          try {
+            Invoke-RestMethod $manifests -Headers @{ Authorization = "Bearer $env:WINGET_TOKEN" } | Out-Null
+          } catch {
+            Write-Output "::notice::$env:PACKAGE_ID is not in winget-pkgs yet: submit the first version by hand"
+            exit 0
+          }
           $version = $env:TAG.Substring(1)
           $url = "https://github.com/${{ github.repository }}/releases/download/$env:TAG/Anthra-Setup-$version-x64.exe"
           # wingetcreate is Microsoft's own tool for winget-pkgs.
           Invoke-WebRequest https://aka.ms/wingetcreate/latest -OutFile wingetcreate.exe
-          .\wingetcreate.exe update iFrosty-tech.Anthra `
+          .\wingetcreate.exe update $env:PACKAGE_ID `
             --version $version `
             --urls "$url|x64|user" `
             --submit `

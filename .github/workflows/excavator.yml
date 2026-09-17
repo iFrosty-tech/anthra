@@ -1,0 +1,27 @@
+# Scoop bucket updater: this repository is also the bucket (bucket/anthra.json).
+#
+# Every 4 hours checks the latest Anthra release (`checkver`), rewrites
+# bucket/anthra.json with its version and hash (`autoupdate`) and commits with
+# the bucket's own GITHUB_TOKEN.
+name: Excavator
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '20 */4 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  excavate:
+    name: Excavate
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Excavate
+        uses: ScoopInstaller/GithubActions@5bceeda181721d9d10a18fdcc3ddca6f33467ae6 # v3.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SKIP_UPDATED: 1
