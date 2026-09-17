@@ -8,208 +8,427 @@
       name="description"
       content="A Windows terminal that opens straight into Claude Code, with a live panel for context, cost, git and recent chats."
     />
+    <meta name="theme-color" content="#17171b" />
+    <meta property="og:title" content="Anthra — the terminal that opens inside Claude Code" />
+    <meta
+      property="og:description"
+      content="Open a directory and Claude Code is running. Beside it, a live panel for context, cost, git and recent chats."
+    />
+    <meta property="og:image" content="https://ifrosty-tech.github.io/anthra/screenshot.png" />
     <link rel="icon" href="icon.png" />
-    <style>
-      :root {
-        color-scheme: dark;
-        --bg: #17171b;
-        --surface: #1c1c21;
-        --surface-2: #212128;
-        --border: #2c2c35;
-        --text: #e7e7ec;
-        --text-dim: #9b9baa;
-        --text-faint: #6a6a78;
-        --accent: #9b8cf7;
-        --accent-soft: rgba(155, 140, 247, 0.14);
-        --accent-line: rgba(155, 140, 247, 0.45);
-        --mono: 'Cascadia Code', 'JetBrains Mono', Consolas, 'Courier New', monospace;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        margin: 0;
-        background: var(--bg);
-        color: var(--text);
-        font: 15px/1.6 system-ui, 'Segoe UI', sans-serif;
-      }
-
-      main {
-        max-width: 1040px;
-        margin: 0 auto;
-        padding: 56px 16px 40px;
-      }
-
-      .mark {
-        color: var(--accent);
-        font-family: var(--mono);
-        font-weight: 700;
-      }
-
-      h1 {
-        margin: 12px 0 8px;
-        font-size: clamp(30px, 5vw, 46px);
-        line-height: 1.15;
-        letter-spacing: -0.01em;
-      }
-
-      .lede {
-        max-width: 640px;
-        margin: 0 0 32px;
-        color: var(--text-dim);
-        font-size: 17px;
-      }
-
-      .install {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 12px;
-        margin-bottom: 40px;
-      }
-
-      .option {
-        display: grid;
-        gap: 6px;
-        align-content: start;
-        padding: 14px 16px;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        background: var(--surface);
-      }
-
-      .option h2 {
-        margin: 0;
-        color: var(--text-dim);
-        font-size: 12px;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-      }
-
-      .option code {
-        display: block;
-        overflow-x: auto;
-        padding: 8px 10px;
-        border-radius: 6px;
-        background: var(--surface-2);
-        font-family: var(--mono);
-        font-size: 13px;
-        white-space: pre;
-      }
-
-      .option.primary {
-        border-color: var(--accent-line);
-        background: var(--accent-soft);
-      }
-
-      .button {
-        display: inline-block;
-        justify-self: start;
-        padding: 7px 14px;
-        border-radius: 6px;
-        background: var(--accent);
-        color: var(--bg);
-        font-weight: 600;
-        text-decoration: none;
-      }
-
-      .note {
-        color: var(--text-faint);
-        font-size: 13px;
-      }
-
-      figure {
-        margin: 0 0 40px;
-      }
-
-      figure img {
-        display: block;
-        width: 100%;
-        height: auto;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-      }
-
-      .features {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 20px 28px;
-        margin: 0 0 40px;
-        padding: 0;
-        list-style: none;
-      }
-
-      .features b {
-        display: block;
-        color: var(--text);
-      }
-
-      .features span {
-        color: var(--text-dim);
-      }
-
-      a {
-        color: var(--accent);
-      }
-
-      footer {
-        padding-top: 20px;
-        border-top: 1px solid var(--border);
-        color: var(--text-faint);
-        font-size: 13px;
-      }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Mona+Sans:wdth,wght@75..125,200..900&display=swap"
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/cascadia-code@5/index.css" />
+    <link rel="stylesheet" href="site.css" />
+    <script>
+      document.documentElement.classList.add('js');
+    </script>
+    <script src="site.js" defer></script>
   </head>
   <body>
-    <main>
-      <span class="mark">&gt;_ Anthra</span>
-      <h1>The terminal that opens already inside Claude Code.</h1>
-      <p class="lede">
-        Open a directory and Claude Code is running. Beside it, a panel shows how much context
-        you are burning, what the session costs and which tab needs you, without asking.
-      </p>
+    <!--
+      THESIS: the page is the product taken apart. One Anthra window, live, straightens under the
+      visitor and then separates into its layers; refuses the screenshot-plus-feature-grid page.
+      OWN-WORLD: Anthra's own chrome: #17171b ground, #1c1c21 surfaces, 1px #2c2c35 rules, lavender
+      #9b8cf7 as the only accent, amber for "needs you", Cascadia Code for every number and path,
+      Mona Sans wide for the voice.
+      STORY: know what it is (Claude Code already running), see what it shows (tabs, shell, panel,
+      toasts), trust it (updates, privacy, honest FAQ), install in one command.
+      FIRST VIEWPORT: headline top-left at display scale, Download + winget line beneath, the live
+      window tilted in perspective filling the lower half, typing.
+      FORM: exploded 3D window, candidate 5 of 7; seed key 9a876fc9.
+      FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the
+      verdict, DESIGN.md, and every shipping raster carrying its provenance
+    -->
+    <a class="skip" href="#install">Skip to install</a>
 
-      <section class="install" aria-label="Install">
-        <div class="option primary">
-          <h2>Installer</h2>
-          <a class="button" href="https://github.com/iFrosty-tech/anthra/releases/latest">Download for Windows</a>
-          <span class="note">Per-user, no admin rights, updates itself. Not code-signed yet: SmartScreen warns once.</span>
-        </div>
-        <div class="option">
-          <h2>winget</h2>
-          <code>winget install iFrosty-tech.Anthra</code>
-        </div>
-        <div class="option">
-          <h2>Scoop</h2>
-          <code>scoop bucket add anthra https://github.com/iFrosty-tech/anthra
-scoop install anthra</code>
+    <header class="nav" data-nav>
+      <a class="brand" href="#top" aria-label="Anthra, back to top">
+        <span class="brand-prompt" aria-hidden="true">&gt;_</span> Anthra
+      </a>
+      <nav aria-label="Sections">
+        <a href="#inside">Inside</a>
+        <a href="#updates">Updates</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="icon-link" href="https://github.com/iFrosty-tech/anthra" aria-label="Anthra on GitHub">
+          <svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+            />
+          </svg>
+        </a>
+        <a class="btn btn-small" href="https://github.com/iFrosty-tech/anthra/releases/latest">Download</a>
+      </div>
+    </header>
+
+    <main id="top">
+      <!-- The story: hero, then the same window pinned and taken apart. -->
+      <section class="story" data-story aria-labelledby="hero-title">
+        <div class="stage" data-stage>
+          <div class="hero" data-hero>
+            <h1 id="hero-title">The terminal that opens already inside&nbsp;Claude&nbsp;Code.</h1>
+            <p class="lede">
+              Open a directory and Claude Code is running. Beside it, a panel shows how much context you are
+              burning, what the session costs and which tab needs you, without asking.
+            </p>
+            <div class="hero-actions">
+              <a class="btn" href="https://github.com/iFrosty-tech/anthra/releases/latest">
+                <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+                  <path fill="currentColor" d="M1 2.3 6.7 1.5v5.4H1zm6.4-.9L15 .3v6.6H7.4zM1 7.6h5.7V13L1 12.2zm6.4 0H15v6.6l-7.6-1z" />
+                </svg>
+                Download for Windows
+                <span class="btn-meta" data-version hidden></span>
+              </a>
+              <button class="cmd" type="button" data-copy="winget install iFrosty-tech.Anthra">
+                <span class="cmd-prompt" aria-hidden="true">&gt;</span>
+                <code>winget install iFrosty-tech.Anthra</code>
+                <span class="cmd-state" aria-hidden="true">
+                  <svg class="i-copy" viewBox="0 0 16 16" width="15" height="15"><rect x="5" y="5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M11 3.5V3a1.5 1.5 0 0 0-1.5-1.5h-6A1.5 1.5 0 0 0 2 3v6.5A1.5 1.5 0 0 0 3.5 11H4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+                  <svg class="i-check" viewBox="0 0 16 16" width="15" height="15"><path d="m3 8.5 3 3 7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="sr-only" data-copy-status></span>
+              </button>
+            </div>
+            <p class="req">Windows 10 or 11 · needs <a href="https://claude.com/claude-code">Claude Code</a> on your PATH · free, MIT</p>
+          </div>
+
+          <!-- Captions for the exploded view; also the plain feature list without the pinned scene. -->
+          <ol class="captions" id="inside" data-captions aria-label="What is inside Anthra">
+            <li class="caption" data-step="0">
+              <h2>Tabs that tell you who needs you</h2>
+              <p>
+                Every tab is a session of its own: its own shell, its own Claude Code, its own directory. A dot says
+                whether Claude is working, has finished, or is waiting for a permission.
+              </p>
+              <p class="caption-meta"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd> new tab · windows, tabs and chats come back on launch</p>
+            </li>
+            <li class="caption" data-step="1">
+              <h2>A real shell, with Claude already in it</h2>
+              <p>
+                PowerShell on ConPTY, not an emulation. Anthra runs <code>claude</code> in the directory you opened, and when
+                Claude Code exits the shell stays, so you can restart it or do something else.
+              </p>
+              <p class="caption-meta">Anthra never touches your Claude Code configuration</p>
+            </li>
+            <li class="caption" data-step="2">
+              <h2>Context and cost, live</h2>
+              <p>
+                Context against the auto-compact threshold, the token breakdown with cache hits, session and daily cost with
+                a per-turn curve and history, the git status of the repository and your recent chats, one click from
+                resuming.
+              </p>
+              <p class="caption-meta"><kbd>Ctrl</kbd>+<kbd>B</kbd> hides the panel when you want the full width</p>
+            </li>
+            <li class="caption" data-step="3">
+              <h2>Look away. Anthra calls you back.</h2>
+              <p>
+                A Windows toast and a taskbar badge when Claude waits for a permission or finishes a turn, only for tabs
+                you are not looking at. Click it and you land on that tab.
+              </p>
+              <p class="caption-meta">Throttled per tab, so a long session never turns into noise</p>
+            </li>
+          </ol>
+
+          <nav class="rail" data-rail aria-label="Layers">
+            <button type="button" data-goto="0">Tabs</button>
+            <button type="button" data-goto="1">Shell</button>
+            <button type="button" data-goto="2">Panel</button>
+            <button type="button" data-goto="3">Toasts</button>
+          </nav>
+
+          <!-- The window. A faithful HTML rebuild of Anthra 0.7; every layer is one feature. -->
+          <div class="viewport" data-viewport>
+            <div
+              class="win"
+              data-win
+              role="img"
+              aria-label="Anthra running: three tabs with their status, Claude Code answering in the terminal, the metrics panel on the right and a Windows notification"
+            >
+              <div class="layer l-frame" data-layer="frame">
+                <div class="titlebar">
+                  <span class="tb-brand"><b>&gt;_</b> Anthra</span>
+                  <span class="tb-sep"></span>
+                  <span class="tb-title"><b>anthra-site</b> — C:\Users\dev\code\anthra-site</span>
+                  <span class="tb-right">CLAUDE.md · 1 MCP</span>
+                  <span class="tb-ctl" aria-hidden="true">
+                    <svg viewBox="0 0 10 10" width="10" height="10"><path d="M0 5h10" stroke="currentColor" /></svg>
+                    <svg viewBox="0 0 10 10" width="10" height="10"><rect x=".5" y=".5" width="9" height="9" fill="none" stroke="currentColor" /></svg>
+                    <svg viewBox="0 0 10 10" width="10" height="10"><path d="m0 0 10 10M10 0 0 10" stroke="currentColor" /></svg>
+                  </span>
+                </div>
+                <div class="hintbar">
+                  <span><b>↵</b> send</span><span><b>⇧↵</b> new line</span><span><b>/</b> commands</span><span><b>@</b> file</span>
+                  <span class="hint-right"><b>ctrl+shift+t</b> new tab</span><span><b>ctrl+b</b> metrics panel</span>
+                </div>
+              </div>
+
+              <div class="layer l-tabs" data-layer="0">
+                <div class="tab is-active"><span class="dot" data-dot="0"></span>anthra-site<span class="tab-x">×</span></div>
+                <div class="tab"><span class="dot" data-dot="1" data-status="waiting"></span>api-server</div>
+                <div class="tab"><span class="dot" data-dot="2" data-status="working"></span>docs</div>
+                <div class="tab tab-add">+</div>
+              </div>
+
+              <div class="layer l-term" data-layer="1">
+                <div class="term-top">
+                  <span class="badge-model">Opus 5 <i>plan</i></span>
+                  <span class="term-clock">session <span data-clock>00:02:41</span></span>
+                </div>
+                <div class="term-body">
+                  <div class="cc-head">
+                    <svg class="cc-logo" viewBox="0 0 13 8" width="52" height="32" aria-hidden="true" shape-rendering="crispEdges">
+                      <path fill="#d97757" d="M2 0h9v1h1v2h1v1h-1v2h-1v1h-1v1H9V7H8v1H7V7H6v1H5V7H4v1H3V7H2V6H1V4H0V3h1V1h1z" />
+                      <path fill="#17171b" d="M4 2h1v1H4zm4 0h1v1H8z" />
+                    </svg>
+                    <div>
+                      <b>Claude Code</b> <span class="dim">v2.1</span><br />
+                      <span class="dim">Opus 5 · Claude Max</span><br />
+                      <span class="dim">~\code\anthra-site</span>
+                    </div>
+                  </div>
+                  <div class="cc-prompt"><span class="dim">&gt;</span> <span data-typed></span><span class="caret" data-caret></span></div>
+                  <div class="cc-line dim" data-step-out="read">Read 2 files</div>
+                  <div class="cc-line" data-step-out="answer">
+                    <span class="bullet">●</span>
+                    <span data-answer></span>
+                  </div>
+                  <div class="cc-line dim" data-step-out="done"><span class="spin">✻</span> Churned for 9s · done</div>
+                </div>
+                <div class="term-input">
+                  <div class="term-rule"></div>
+                  <div><span class="dim">&gt;</span> <span class="faint">Try "show where it's used"</span></div>
+                  <div class="term-rule"></div>
+                  <div class="faint">⏸ plan mode on · ? for shortcuts</div>
+                </div>
+              </div>
+
+              <div class="layer l-panel" data-layer="2">
+                <div class="pn-sec">
+                  <div class="pn-h"><span>SESSION</span><span data-clock-2>00:02:41</span></div>
+                  <div class="ctx">
+                    <svg viewBox="0 0 44 44" width="52" height="52" aria-hidden="true">
+                      <circle cx="22" cy="22" r="18" fill="none" stroke="var(--track)" stroke-width="4" />
+                      <circle class="ctx-arc" data-ring cx="22" cy="22" r="18" fill="none" stroke="var(--text)" stroke-width="4" pathLength="100" stroke-dasharray="18 100" transform="rotate(-90 22 22)" />
+                      <circle cx="22" cy="22" r="18" fill="none" stroke="var(--accent)" stroke-width="4" pathLength="100" stroke-dasharray=".8 100" stroke-dashoffset="-89.5" transform="rotate(-90 22 22)" />
+                    </svg>
+                    <div>
+                      <div class="ctx-pct"><span data-pct>18</span><small>%</small></div>
+                      <div class="dim"><span data-ctxk>36</span>k / 200k context</div>
+                      <div class="accent">auto-compact at 180k</div>
+                    </div>
+                  </div>
+                  <div class="kv"><span>System + CLAUDE.md</span><b>38k</b></div>
+                  <div class="kv"><span>Files read</span><b data-files>0.4k</b></div>
+                  <div class="kv"><span>Conversation</span><b data-conv>1.2k</b></div>
+                </div>
+                <div class="pn-sec">
+                  <div class="pn-h"><span>TOKENS</span><span>cache hit <b class="green" data-cache>78%</b></span></div>
+                  <div class="bar"><span>Input</span><b data-in>31k</b><i style="--w: 0.39" data-in-bar></i></div>
+                  <div class="bar"><span>Output</span><b data-out>0.7k</b><i style="--w: 0.06" data-out-bar></i></div>
+                </div>
+                <div class="pn-sec">
+                  <div class="cost"><b>$<span data-cost>0.06</span></b> <span class="dim">session</span><span class="today">today <b>$4.12</b></span></div>
+                  <svg class="curve" viewBox="0 0 220 36" preserveAspectRatio="none" aria-hidden="true">
+                    <path data-curve d="M0 34 L40 33 L80 31 L120 30 L150 22 L175 26 L200 18 L220 16" fill="none" stroke="var(--accent)" stroke-width="1.5" vector-effect="non-scaling-stroke" />
+                  </svg>
+                </div>
+                <div class="pn-sec">
+                  <div class="pn-h"><span>REPOSITORY</span><span><b class="green">+214</b> <b class="red">−38</b></span></div>
+                  <div class="git"><span class="accent">⎇ main</span></div>
+                  <div class="git"><b class="amber">M</b> index.html</div>
+                  <div class="git"><b class="amber">M</b> site.css</div>
+                  <div class="git"><b class="green">A</b> site.js</div>
+                </div>
+                <div class="pn-sec pn-last">
+                  <div class="pn-h"><span>RECENT CHATS</span><span class="accent">6</span></div>
+                  <div class="chat is-current"><b>Landing page motion</b><span>anthra-site · today</span></div>
+                  <div class="chat"><b>Release notes 0.7.2</b><span>anthra · yesterday</span></div>
+                </div>
+              </div>
+
+              <div class="layer l-toast" data-layer="3">
+                <div class="toast" data-toast>
+                  <div class="toast-app"><img src="icon.png" alt="" width="16" height="16" /> Anthra</div>
+                  <b>api-server</b>
+                  <span>Claude needs your permission</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="win-note" data-note>Rebuilt in HTML from Anthra 0.7. Numbers are illustrative.</p>
         </div>
       </section>
 
-      <figure>
-        <img
-          src="screenshot.png"
-          alt="Anthra with three tabs and their status, Claude Code in the terminal and the metrics panel on the right"
-          width="1360"
-          height="860"
-        />
-      </figure>
+      <section class="updates" id="updates" aria-labelledby="updates-title">
+        <div class="wrap">
+          <div class="split">
+            <h2 id="updates-title" class="h-section">Updates itself, then gets out of the way.</h2>
+            <p class="section-lede">
+              The installed build downloads new versions in the background and installs them when you quit. Your windows,
+              tabs and chats reopen afterwards, with a <em>What’s new</em> window listing what changed.
+            </p>
+          </div>
+          <ol class="timeline" data-reveal>
+            <li><time>+30 s</time><b>Checks after launch</b><span>and again every 6 hours</span></li>
+            <li><time>background</time><b>Downloads quietly</b><span>no prompt while you work</span></li>
+            <li><time>on quit</time><b>Installs</b><span>or now, with <em>Restart to update</em> in the tab bar</span></li>
+            <li><time>next launch</time><b>Everything is back</b><span>windows, tabs, chats and <em>What’s new</em></span></li>
+          </ol>
+          <p class="fine">Portable and Scoop installs show a button instead. Preferences → Updates turns the check off.</p>
+        </div>
+      </section>
 
-      <ul class="features">
-        <li><b>Tabs that tell you who needs you</b><span>A dot per tab, Windows toasts and a taskbar badge when Claude waits for a permission or finishes a turn.</span></li>
-        <li><b>Context and cost, live</b><span>Context against the auto-compact threshold, tokens, cache hits, session and daily cost with history.</span></li>
-        <li><b>Pick up where you left off</b><span>Resume any chat in one click, and get your windows, tabs and chats back on launch.</span></li>
-        <li><b>Stays out of Claude Code's way</b><span>A real PowerShell on ConPTY. Anthra never touches your Claude Code configuration.</span></li>
-      </ul>
+      <section class="install" id="install" aria-labelledby="install-title">
+        <div class="wrap split">
+          <div>
+            <h2 id="install-title" class="h-section">Install in one line.</h2>
+            <p class="section-lede">
+              Per-user, no admin rights. Pick the channel you already use; every one of them keeps Anthra up to date.
+            </p>
+            <p class="fine">
+              Anthra is not code-signed yet, so SmartScreen warns once about the installer download. winget, Scoop and
+              Anthra’s own updates don’t go through SmartScreen.
+            </p>
+          </div>
 
-      <footer>
-        Requires Windows 10 or 11 and <a href="https://claude.com/claude-code">Claude Code</a>.
-        <a href="https://github.com/iFrosty-tech/anthra">GitHub</a> ·
-        <a href="https://github.com/iFrosty-tech/anthra/releases">Release notes</a> ·
-        <a href="https://github.com/iFrosty-tech/anthra#privacy">Privacy</a>
-      </footer>
+          <div class="console" data-tabs>
+            <div class="console-tabs" role="tablist" aria-label="Install method">
+              <button role="tab" id="t-winget" aria-controls="p-winget" aria-selected="true">winget</button>
+              <button role="tab" id="t-scoop" aria-controls="p-scoop" aria-selected="false" tabindex="-1">Scoop</button>
+              <button role="tab" id="t-setup" aria-controls="p-setup" aria-selected="false" tabindex="-1">Installer</button>
+              <button role="tab" id="t-portable" aria-controls="p-portable" aria-selected="false" tabindex="-1">Portable</button>
+              <span class="console-ink" data-ink aria-hidden="true"></span>
+            </div>
+
+            <div class="console-panel" role="tabpanel" id="p-winget" aria-labelledby="t-winget">
+              <div class="line">
+                <span class="ps">PS&gt;</span><code>winget install iFrosty-tech.Anthra</code>
+                <button class="copy" type="button" data-copy="winget install iFrosty-tech.Anthra">Copy</button>
+              </div>
+              <p class="console-out">Updates by itself, or with <code>winget upgrade</code>.</p>
+            </div>
+
+            <div class="console-panel" role="tabpanel" id="p-scoop" aria-labelledby="t-scoop" hidden>
+              <div class="line">
+                <span class="ps">PS&gt;</span><code>scoop bucket add anthra https://github.com/iFrosty-tech/anthra</code>
+                <button class="copy" type="button" data-copy="scoop bucket add anthra https://github.com/iFrosty-tech/anthra&#10;scoop install anthra">Copy</button>
+              </div>
+              <div class="line"><span class="ps">PS&gt;</span><code>scoop install anthra</code></div>
+              <p class="console-out">Update with <code>scoop update anthra</code>.</p>
+            </div>
+
+            <div class="console-panel" role="tabpanel" id="p-setup" aria-labelledby="t-setup" hidden>
+              <p class="console-file"><code>Anthra-Setup-<span data-version-raw>&lt;version&gt;</span>-x64.exe</code></p>
+              <a class="btn" href="https://github.com/iFrosty-tech/anthra/releases/latest">Download the installer</a>
+              <p class="console-out">Updates by itself and installs the new version when you quit.</p>
+            </div>
+
+            <div class="console-panel" role="tabpanel" id="p-portable" aria-labelledby="t-portable" hidden>
+              <p class="console-file"><code>Anthra-Portable-<span data-version-raw>&lt;version&gt;</span>-x64.exe</code></p>
+              <a class="btn btn-ghost" href="https://github.com/iFrosty-tech/anthra/releases/latest">Download portable</a>
+              <p class="console-out">No install. Download the new one to update.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="privacy" id="privacy" aria-labelledby="privacy-title">
+        <div class="wrap">
+          <h2 id="privacy-title" class="h-statement">
+            Reads local files. <span class="dim-h">No telemetry, no analytics, no account.</span>
+          </h2>
+          <dl class="reads" data-reveal>
+            <div><dt><code>~/.claude</code></dt><dd>Claude Code’s transcripts, for context, tokens and cost</dd></div>
+            <div><dt><code>git status</code></dt><dd>of each tab’s directory</dd></div>
+            <div><dt><code>%APPDATA%\Anthra</code></dt><dd>its own state: windows, tabs, preferences</dd></div>
+            <div><dt><code>github.com</code></dt><dd>the one request it makes on its own: the update check, sending nothing beyond what any download does</dd></div>
+          </dl>
+        </div>
+      </section>
+
+      <section class="faq" id="faq" aria-labelledby="faq-title">
+        <div class="wrap split">
+          <h2 id="faq-title" class="h-section">Straight answers.</h2>
+          <div class="faq-list">
+            <details>
+              <summary>Why does SmartScreen warn me?</summary>
+              <div class="faq-body">
+                <p>
+                  Anthra is not code-signed yet, and SmartScreen warns about unsigned downloads it has not seen often. To
+                  check a download, compare its SHA-512 with the <code>sha512</code> in that release’s <code>latest.yml</code>:
+                </p>
+                <pre><code>[Convert]::ToBase64String([Security.Cryptography.SHA512]::Create().ComputeHash([IO.File]::ReadAllBytes("$PWD\Anthra-Setup-&lt;version&gt;-x64.exe")))</code></pre>
+              </div>
+            </details>
+            <details>
+              <summary>Are the costs what I will be billed?</summary>
+              <div class="faq-body">
+                <p>
+                  No, they are estimates from a local rate table. On a subscription they are the API-equivalent cost of what
+                  you used.
+                </p>
+              </div>
+            </details>
+            <details>
+              <summary>Does it change my Claude Code setup?</summary>
+              <div class="faq-body">
+                <p>
+                  No. Anthra never writes to Claude Code’s configuration. It starts <code>claude</code> in a real PowerShell
+                  and reads the transcripts Claude Code already writes.
+                </p>
+              </div>
+            </details>
+            <details>
+              <summary>How do I remove Anthra completely?</summary>
+              <div class="faq-body">
+                <p>
+                  Uninstall it from Windows Settings (or <code>winget uninstall iFrosty-tech.Anthra</code>,
+                  <code>scoop uninstall anthra</code>), then delete <code>%APPDATA%\Anthra</code>.
+                </p>
+              </div>
+            </details>
+            <details>
+              <summary>I updated from 0.6 and nothing happened.</summary>
+              <div class="faq-body">
+                <p>Versions 0.6 and earlier have no updater, so that one update has to be done by hand. From 0.7 on, Anthra updates itself.</p>
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section class="close" aria-labelledby="close-title">
+        <div class="wrap">
+          <p class="close-prompt" aria-hidden="true"><span class="accent">&gt;_</span><span class="caret"></span></p>
+          <h2 id="close-title" class="h-display">Open a directory.<br />Claude is already there.</h2>
+          <div class="hero-actions">
+            <a class="btn" href="https://github.com/iFrosty-tech/anthra/releases/latest">
+              Download for Windows <span class="btn-meta" data-version hidden></span>
+            </a>
+            <a class="btn btn-ghost" href="https://github.com/iFrosty-tech/anthra/releases">Release notes</a>
+          </div>
+        </div>
+      </section>
     </main>
+
+    <footer class="foot">
+      <div class="wrap foot-row">
+        <span class="brand"><span class="brand-prompt" aria-hidden="true">&gt;_</span> Anthra</span>
+        <span class="foot-meta">MIT license · Windows 10 and 11 · for <a href="https://claude.com/claude-code">Claude Code</a></span>
+        <span class="foot-links">
+          <a href="https://github.com/iFrosty-tech/anthra">GitHub</a>
+          <a href="https://github.com/iFrosty-tech/anthra/issues">Report a bug</a>
+          <a href="https://github.com/iFrosty-tech/anthra#privacy">Privacy</a>
+        </span>
+      </div>
+    </footer>
   </body>
 </html>
