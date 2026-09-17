@@ -1,0 +1,53 @@
+name: Bug report
+description: Something in Anthra does not work as it should
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, what you got instead.
+    validations:
+      required: true
+  - type: input
+    id: anthra
+    attributes:
+      label: Anthra version
+      description: Preferences → Updates shows it.
+      placeholder: 0.7.0
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How you installed it
+      options:
+        - Installer
+        - Portable
+        - winget
+        - Scoop
+        - Built from source
+    validations:
+      required: true
+  - type: input
+    id: claude
+    attributes:
+      label: Claude Code version
+      description: Output of `claude --version`.
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      placeholder: Windows 11 24H2
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: >
+        For update problems, `%APPDATA%\Anthra\logs\updater.log`. Remove anything
+        private (paths, chat titles) before pasting.
+      render: text

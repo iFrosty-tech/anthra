@@ -1,0 +1,45 @@
+name: winget
+
+# A published release opens a pull request on microsoft/winget-pkgs with the
+# new installer. The first version of iFrosty-tech.Anthra is submitted by hand
+# (`wingetcreate new`); this workflow only updates it.
+#
+# WINGET_TOKEN is a classic PAT with the public_repo scope, able to push to the
+# account's fork of winget-pkgs. It lives in the `winget` environment, so no
+# other workflow — and no pull request — can read it.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to submit (vX.Y.Z)
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  submit:
+    if: ${{ !github.event.release.prerelease }}
+    runs-on: windows-latest
+    timeout-minutes: 15
+    environment: winget
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+    steps:
+      - name: Submit to winget-pkgs
+        env:
+          WINGET_TOKEN: ${{ secrets.WINGET_TOKEN }}
+        run: |
+          if ($env:TAG -notmatch '^v\d+\.\d+\.\d+$') { throw "not a release tag: $env:TAG" }
+          $version = $env:TAG.Substring(1)
+          $url = "https://github.com/${{ github.repository }}/releases/download/$env:TAG/Anthra-Setup-$version-x64.exe"
+          # wingetcreate is Microsoft's own tool for winget-pkgs.
+          Invoke-WebRequest https://aka.ms/wingetcreate/latest -OutFile wingetcreate.exe
+          .\wingetcreate.exe update iFrosty-tech.Anthra `
+            --version $version `
+            --urls "$url|x64|user" `
+            --submit `
+            --token $env:WINGET_TOKEN

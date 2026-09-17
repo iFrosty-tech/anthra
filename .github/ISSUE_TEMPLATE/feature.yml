@@ -1,0 +1,17 @@
+name: Feature request
+description: An idea for Anthra
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What gets in your way today, while working with Claude Code in Anthra.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What you would like
+    validations:
+      required: true
