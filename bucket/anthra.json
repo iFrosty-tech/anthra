@@ -17,7 +17,9 @@
             "Anthra"
         ]
     ],
-    "checkver": "github",
+    "checkver": {
+        "github": "https://github.com/iFrosty-tech/anthra"
+    },
     "autoupdate": {
         "architecture": {
             "64bit": {
