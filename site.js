@@ -210,15 +210,13 @@
       ring: $('[data-ring]'),
       pct: $('[data-pct]'),
       ctxk: $('[data-ctxk]'),
-      files: $('[data-files]'),
-      conv: $('[data-conv]'),
-      cache: $('[data-cache]'),
-      inp: $('[data-in]'),
-      inBar: $('[data-in-bar]'),
-      out: $('[data-out]'),
-      outBar: $('[data-out-bar]'),
+      lim: $('[data-lim]'),
+      limBar: $('[data-lim-bar]'),
       cost: $('[data-cost]'),
       curve: $('[data-curve]'),
+      trend: $('[data-trend]'),
+      forecast: $('[data-forecast]'),
+      turn: $('[data-turn]'),
       toast: $('[data-toast]'),
       dots: $$('[data-dot]'),
       clocks: [$('[data-clock]'), $('[data-clock-2]')],
@@ -229,26 +227,33 @@
       'Added a scroll-linked transform in site.js: the window starts tilted back, settles flat as the headline lifts away, and stays still with prefers-reduced-motion.';
     const CURVE_A = 'M0 34 L40 33 L80 31 L120 30 L150 22 L175 26 L200 18 L220 16';
     const CURVE_B = 'M0 34 L40 33 L80 31 L120 30 L150 22 L175 26 L200 18 L220 6';
+    // Context after each turn, with one compaction; the finished turn adds the last point.
+    const TREND_A = 'M0 34 L20 29.2 L40 24.4 L60 19.6 L80 14 L100 8.4 L100 33.2 L120 30 L140 26.8 L160 23.6 L180 21.2 L200 18.8';
+    const TREND_B = `${TREND_A} L220 16.4`;
+
+    const START = { pct: 58, ctx: 116, cost: 0.06, lim: 31 };
+    const END = { pct: 64, ctx: 128, cost: 0.09, lim: 33 };
 
     let run = 0;
     let visible = true;
-    let waiters = [];
     let seconds = 161;
 
-    const state = { pct: 18, ctx: 36, files: 0.4, conv: 1.2, inp: 31, out: 0.7, cost: 0.06, cache: 78 };
+    const state = { ...START };
 
     function render() {
       el.pct.textContent = Math.round(state.pct);
       el.ctxk.textContent = Math.round(state.ctx);
       el.ring.setAttribute('stroke-dasharray', `${state.pct.toFixed(1)} 100`);
-      el.files.textContent = `${state.files.toFixed(1)}k`;
-      el.conv.textContent = `${state.conv.toFixed(1)}k`;
-      el.inp.textContent = `${Math.round(state.inp)}k`;
-      el.inBar.style.setProperty('--w', clamp(state.inp / 80).toFixed(3));
-      el.out.textContent = `${state.out.toFixed(1)}k`;
-      el.outBar.style.setProperty('--w', clamp(state.out / 12).toFixed(3));
+      el.lim.textContent = Math.round(state.lim);
+      el.limBar.style.setProperty('--w', clamp(state.lim / 100).toFixed(3));
       el.cost.textContent = state.cost.toFixed(2);
-      el.cache.textContent = `${Math.round(state.cache)}%`;
+    }
+
+    function turnEnd(done) {
+      el.curve.setAttribute('d', done ? CURVE_B : CURVE_A);
+      el.trend.setAttribute('d', done ? TREND_B : TREND_A);
+      el.forecast.textContent = done ? 'in ~4 turns' : 'in ~5 turns';
+      el.turn.textContent = done ? '12' : '11';
     }
 
     // Sleeps that pause while the window is off screen and die on restart.
@@ -289,7 +294,7 @@
     }
 
     function reset() {
-      Object.assign(state, { pct: 18, ctx: 36, files: 0.4, conv: 1.2, inp: 31, out: 0.7, cost: 0.06, cache: 78 });
+      Object.assign(state, START);
       render();
       el.typed.textContent = '';
       el.answer.textContent = '';
@@ -298,13 +303,13 @@
       el.answerLine.classList.add('is-hidden');
       el.done.classList.add('is-hidden');
       el.toast.classList.remove('is-shown');
-      el.curve.setAttribute('d', CURVE_A);
+      turnEnd(false);
       el.dots[1].dataset.status = 'unread';
       el.dots[2].dataset.status = 'working';
     }
 
     function finalState() {
-      Object.assign(state, { pct: 21, ctx: 42, files: 3.1, conv: 2.6, inp: 38, out: 1.9, cost: 0.09, cache: 81 });
+      Object.assign(state, END);
       render();
       el.typed.textContent = PROMPT;
       el.answer.textContent = ANSWER;
@@ -313,7 +318,7 @@
       el.answerLine.classList.remove('is-hidden');
       el.done.classList.remove('is-hidden');
       el.toast.classList.add('is-shown');
-      el.curve.setAttribute('d', CURVE_B);
+      turnEnd(true);
       el.dots[1].dataset.status = 'waiting';
       el.dots[2].dataset.status = 'unread';
     }
@@ -331,19 +336,19 @@
         el.dots[2].dataset.status = 'working';
         await wait(700, id);
         el.read.classList.remove('is-hidden');
-        await tween({ pct: 20, ctx: 40, files: 3.1, inp: 36, cost: 0.07, cache: 80 }, 900, id);
+        await tween({ pct: 61, ctx: 122, cost: 0.07, lim: 32 }, 900, id);
         await wait(600, id);
         el.answerLine.classList.remove('is-hidden');
         const words = ANSWER.split(' ');
         let text = '';
-        const grow = tween({ pct: 21, ctx: 42, conv: 2.6, inp: 38, out: 1.9, cost: 0.09, cache: 81 }, 2600, id);
+        const grow = tween(END, 2600, id);
         for (const w of words) {
           text += (text ? ' ' : '') + w;
           el.answer.textContent = text;
           await wait(45 + Math.random() * 45, id);
         }
         await grow;
-        el.curve.setAttribute('d', CURVE_B);
+        turnEnd(true);
         el.done.classList.remove('is-hidden');
         el.dots[2].dataset.status = 'unread';
         await wait(1300, id);
@@ -398,6 +403,98 @@
     { rootMargin: '0px 0px -15% 0px' },
   );
   $$('[data-reveal]').forEach((n) => revealer.observe(n));
+
+  /* ---------------- Panel playground: resize, fold, move ---------------- */
+
+  const play = $('[data-play]');
+  if (play) {
+    const frame = $('[data-play-stage]', play);
+    const edge = $('[data-edge]', play);
+    const readout = $('[data-width]', play);
+    const mini = $('[data-mini]', play);
+    const list = $('[data-mini-list]', play);
+    const MIN = 240;
+    const DEFAULT = 300;
+    const WIDE = 440;
+    let width = DEFAULT;
+
+    // As in the app: up to 640 px, and here never wider than the frame allows.
+    const maxWidth = () => Math.max(MIN, Math.min(640, frame.clientWidth - 48));
+
+    function setWidth(w) {
+      width = Math.round(clamp(w, MIN, maxWidth()));
+      frame.style.setProperty('--pw', `${width}px`);
+      mini.classList.toggle('is-wide', width >= WIDE);
+      readout.textContent = `${width} px`;
+      edge.setAttribute('aria-valuenow', String(width));
+      edge.setAttribute('aria-valuemax', String(maxWidth()));
+      edge.setAttribute('aria-valuetext', `${width} pixels`);
+    }
+
+    edge.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      edge.setPointerCapture(e.pointerId);
+      edge.classList.add('is-drag');
+      const right = frame.getBoundingClientRect().right;
+      const move = (ev) => setWidth(right - ev.clientX);
+      const stop = () => {
+        edge.classList.remove('is-drag');
+        edge.removeEventListener('pointermove', move);
+        edge.removeEventListener('pointerup', stop);
+        edge.removeEventListener('pointercancel', stop);
+      };
+      edge.addEventListener('pointermove', move);
+      edge.addEventListener('pointerup', stop);
+      edge.addEventListener('pointercancel', stop);
+    });
+    edge.addEventListener('dblclick', () => setWidth(DEFAULT));
+    edge.addEventListener('keydown', (e) => {
+      const step = e.shiftKey ? 64 : 16;
+      // The panel sits on the right: moving its edge left makes it wider.
+      if (e.key === 'ArrowLeft') setWidth(width + step);
+      else if (e.key === 'ArrowRight') setWidth(width - step);
+      else if (e.key === 'Home') setWidth(DEFAULT);
+      else return;
+      e.preventDefault();
+    });
+
+    // Move a section and let the others glide into place.
+    function moveSection(sec, dir) {
+      const secs = $$('[data-sec]', list);
+      const i = secs.indexOf(sec);
+      const j = i + dir;
+      if (j < 0 || j >= secs.length) return;
+      const before = new Map(secs.map((s) => [s, s.getBoundingClientRect().top]));
+      if (dir < 0) list.insertBefore(sec, secs[j]);
+      else list.insertBefore(sec, secs[j].nextSibling);
+      if (reducedQuery.matches) return;
+      for (const s of secs) {
+        const dy = before.get(s) - s.getBoundingClientRect().top;
+        if (!dy) continue;
+        s.animate([{ transform: `translateY(${dy}px)` }, { transform: 'none' }], {
+          duration: 450,
+          easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+        });
+      }
+    }
+
+    $$('.mini-h', list).forEach((btn) => {
+      const sec = btn.closest('[data-sec]');
+      btn.addEventListener('click', () => {
+        const folded = sec.classList.toggle('is-folded');
+        btn.setAttribute('aria-expanded', String(!folded));
+      });
+      btn.addEventListener('keydown', (e) => {
+        if (!e.altKey || (e.key !== 'ArrowUp' && e.key !== 'ArrowDown')) return;
+        e.preventDefault();
+        moveSection(sec, e.key === 'ArrowUp' ? -1 : 1);
+        btn.focus();
+      });
+    });
+
+    addEventListener('resize', () => setWidth(width));
+    setWidth(DEFAULT);
+  }
 
   /* ---------------- Copy buttons ---------------- */
 

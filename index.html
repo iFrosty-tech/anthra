@@ -6,7 +6,7 @@
     <title>Anthra — the terminal that opens inside Claude Code</title>
     <meta
       name="description"
-      content="A Windows terminal that opens straight into Claude Code, with a live panel for context, cost, git and recent chats."
+      content="A Windows terminal that opens straight into Claude Code, with a live panel for context, cost and plan limits, parallel tasks on git worktrees, and search across every chat."
     />
     <meta name="theme-color" content="#17171b" />
     <meta property="og:title" content="Anthra — the terminal that opens inside Claude Code" />
@@ -30,20 +30,6 @@
     <script src="site.js" defer></script>
   </head>
   <body>
-    <!--
-      THESIS: the page is the product taken apart. One Anthra window, live, straightens under the
-      visitor and then separates into its layers; refuses the screenshot-plus-feature-grid page.
-      OWN-WORLD: Anthra's own chrome: #17171b ground, #1c1c21 surfaces, 1px #2c2c35 rules, lavender
-      #9b8cf7 as the only accent, amber for "needs you", Cascadia Code for every number and path,
-      Mona Sans wide for the voice.
-      STORY: know what it is (Claude Code already running), see what it shows (tabs, shell, panel,
-      toasts), trust it (updates, privacy, honest FAQ), install in one command.
-      FIRST VIEWPORT: headline top-left at display scale, Download + winget line beneath, the live
-      window tilted in perspective filling the lower half, typing.
-      FORM: exploded 3D window, candidate 5 of 7; seed key 9a876fc9.
-      FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the
-      verdict, DESIGN.md, and every shipping raster carrying its provenance
-    -->
     <a class="skip" href="#install">Skip to install</a>
 
     <header class="nav" data-nav>
@@ -52,6 +38,9 @@
       </a>
       <nav aria-label="Sections">
         <a href="#inside">Inside</a>
+        <a href="#panel">Panel</a>
+        <a href="#tasks">Tasks</a>
+        <a href="#history">History</a>
         <a href="#updates">Updates</a>
         <a href="#privacy">Privacy</a>
         <a href="#faq">FAQ</a>
@@ -97,7 +86,7 @@
                 <span class="sr-only" data-copy-status></span>
               </button>
             </div>
-            <p class="req">Windows 10 or 11 · needs <a href="https://claude.com/claude-code">Claude Code</a> on your PATH · free, MIT</p>
+            <p class="req">Windows 10 or 11 · needs <a href="https://claude.com/claude-code">Claude Code</a> on your PATH, and git for tasks · free, MIT</p>
           </div>
 
           <!-- Captions for the exploded view; also the plain feature list without the pinned scene. -->
@@ -106,7 +95,8 @@
               <h2>Tabs that tell you who needs you</h2>
               <p>
                 Every tab is a session of its own: its own shell, its own Claude Code, its own directory. A dot says
-                whether Claude is working, has finished, or is waiting for a permission.
+                whether Claude is working, has finished, or is waiting for a permission. Beside it, git: commits ahead
+                and behind, and a mark while something is uncommitted.
               </p>
               <p class="caption-meta"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd> new tab · windows, tabs and chats come back on launch</p>
             </li>
@@ -116,16 +106,15 @@
                 PowerShell on ConPTY, not an emulation. Anthra runs <code>claude</code> in the directory you opened, and when
                 Claude Code exits the shell stays, so you can restart it or do something else.
               </p>
-              <p class="caption-meta">Anthra never touches your Claude Code configuration</p>
+              <p class="caption-meta"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd> puts two sessions side by side, still split on the next launch</p>
             </li>
             <li class="caption" data-step="2">
               <h2>Context and cost, live</h2>
               <p>
-                Context against the auto-compact threshold, the token breakdown with cache hits, session and daily cost with
-                a per-turn curve and history, the git status of the repository and your recent chats, one click from
-                resuming.
+                Context against the auto-compact threshold and when the next compaction is due, session and daily cost,
+                your Pro or Max plan limits, the files this tab touched and your recent chats, one click from resuming.
               </p>
-              <p class="caption-meta"><kbd>Ctrl</kbd>+<kbd>B</kbd> hides the panel when you want the full width</p>
+              <p class="caption-meta"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> or the title-bar button hides it when you want the full width</p>
             </li>
             <li class="caption" data-step="3">
               <h2>Look away. Anthra calls you back.</h2>
@@ -144,13 +133,13 @@
             <button type="button" data-goto="3">Toasts</button>
           </nav>
 
-          <!-- The window. A faithful HTML rebuild of Anthra 0.7; every layer is one feature. -->
+          <!-- The window, rebuilt in HTML from Anthra 0.10; every layer is one feature. -->
           <div class="viewport" data-viewport>
             <div
               class="win"
               data-win
               role="img"
-              aria-label="Anthra running: three tabs with their status, Claude Code answering in the terminal, the metrics panel on the right and a Windows notification"
+              aria-label="Anthra running: three tabs with their status and git marks, one of them a task, Claude Code answering in the terminal, the panel on the right with context over time and plan limits, and a Windows notification"
             >
               <div class="layer l-frame" data-layer="frame">
                 <div class="titlebar">
@@ -158,6 +147,9 @@
                   <span class="tb-sep"></span>
                   <span class="tb-title"><b>anthra-site</b> — C:\Users\dev\code\anthra-site</span>
                   <span class="tb-right">CLAUDE.md · 1 MCP</span>
+                  <span class="tb-panel" aria-hidden="true">
+                    <svg viewBox="0 0 14 12" width="14" height="12"><rect x=".5" y=".5" width="13" height="11" rx="1.5" fill="none" stroke="currentColor" /><path d="M9 .5v11" stroke="currentColor" /><path d="M9.5 1h3.5v10H9.5z" fill="currentColor" opacity=".35" /></svg>
+                  </span>
                   <span class="tb-ctl" aria-hidden="true">
                     <svg viewBox="0 0 10 10" width="10" height="10"><path d="M0 5h10" stroke="currentColor" /></svg>
                     <svg viewBox="0 0 10 10" width="10" height="10"><rect x=".5" y=".5" width="9" height="9" fill="none" stroke="currentColor" /></svg>
@@ -166,14 +158,18 @@
                 </div>
                 <div class="hintbar">
                   <span><b>↵</b> send</span><span><b>⇧↵</b> new line</span><span><b>/</b> commands</span><span><b>@</b> file</span>
-                  <span class="hint-right"><b>ctrl+shift+t</b> new tab</span><span><b>ctrl+b</b> metrics panel</span>
+                  <span class="hint-right"><b>ctrl+shift+t</b> new tab</span><span><b>ctrl+shift+b</b> metrics panel</span>
                 </div>
               </div>
 
               <div class="layer l-tabs" data-layer="0">
-                <div class="tab is-active"><span class="dot" data-dot="0"></span>anthra-site<span class="tab-x">×</span></div>
-                <div class="tab"><span class="dot" data-dot="1" data-status="waiting"></span>api-server</div>
-                <div class="tab"><span class="dot" data-dot="2" data-status="working"></span>docs</div>
+                <div class="tab is-active">
+                  <span class="dot" data-dot="0"></span>anthra-site<span class="tab-git"><i class="tab-dirty"></i></span><span class="tab-x">×</span>
+                </div>
+                <div class="tab"><span class="dot" data-dot="1" data-status="waiting"></span>api-server<span class="tab-git">↓2</span></div>
+                <div class="tab">
+                  <span class="dot" data-dot="2" data-status="working"></span>hero-motion<span class="tab-git"><span class="tab-branch">anthra/hero-motion</span> ↑3</span>
+                </div>
                 <div class="tab tab-add">+</div>
               </div>
 
@@ -211,46 +207,53 @@
               </div>
 
               <div class="layer l-panel" data-layer="2">
+                <span class="pn-grip"></span>
                 <div class="pn-sec">
                   <div class="pn-h"><span>SESSION</span><span data-clock-2>00:02:41</span></div>
                   <div class="ctx">
                     <svg viewBox="0 0 44 44" width="52" height="52" aria-hidden="true">
                       <circle cx="22" cy="22" r="18" fill="none" stroke="var(--track)" stroke-width="4" />
-                      <circle class="ctx-arc" data-ring cx="22" cy="22" r="18" fill="none" stroke="var(--text)" stroke-width="4" pathLength="100" stroke-dasharray="18 100" transform="rotate(-90 22 22)" />
+                      <circle class="ctx-arc" data-ring cx="22" cy="22" r="18" fill="none" stroke="var(--text)" stroke-width="4" pathLength="100" stroke-dasharray="58 100" transform="rotate(-90 22 22)" />
                       <circle cx="22" cy="22" r="18" fill="none" stroke="var(--accent)" stroke-width="4" pathLength="100" stroke-dasharray=".8 100" stroke-dashoffset="-89.5" transform="rotate(-90 22 22)" />
                     </svg>
                     <div>
-                      <div class="ctx-pct"><span data-pct>18</span><small>%</small></div>
-                      <div class="dim"><span data-ctxk>36</span>k / 200k context</div>
+                      <div class="ctx-pct"><span data-pct>58</span><small>%</small></div>
+                      <div class="dim"><span data-ctxk>116</span>k / 200k context</div>
                       <div class="accent">auto-compact at 180k</div>
                     </div>
                   </div>
-                  <div class="kv"><span>System + CLAUDE.md</span><b>38k</b></div>
-                  <div class="kv"><span>Files read</span><b data-files>0.4k</b></div>
-                  <div class="kv"><span>Conversation</span><b data-conv>1.2k</b></div>
                 </div>
                 <div class="pn-sec">
-                  <div class="pn-h"><span>TOKENS</span><span>cache hit <b class="green" data-cache>78%</b></span></div>
-                  <div class="bar"><span>Input</span><b data-in>31k</b><i style="--w: 0.39" data-in-bar></i></div>
-                  <div class="bar"><span>Output</span><b data-out>0.7k</b><i style="--w: 0.06" data-out-bar></i></div>
+                  <div class="pn-h"><span>CONTEXT OVER TIME</span><span>turn <b data-turn>11</b></span></div>
+                  <svg class="trend" viewBox="0 0 220 44" preserveAspectRatio="none" aria-hidden="true">
+                    <path d="M0 6H220" stroke="var(--accent)" stroke-dasharray="3 3" opacity=".6" vector-effect="non-scaling-stroke" />
+                    <path d="M100 2V42" stroke="var(--text-faint)" stroke-dasharray="2 3" vector-effect="non-scaling-stroke" />
+                    <path data-trend d="M0 34 L20 29.2 L40 24.4 L60 19.6 L80 14 L100 8.4 L100 33.2 L120 30 L140 26.8 L160 23.6 L180 21.2 L200 18.8" fill="none" stroke="var(--text)" stroke-width="1.5" vector-effect="non-scaling-stroke" />
+                  </svg>
+                  <div class="kv"><span>Next compaction</span><b class="accent" data-forecast>in ~5 turns</b></div>
                 </div>
                 <div class="pn-sec">
+                  <div class="pn-h"><span>PLAN LIMITS</span><span>Max</span></div>
+                  <div class="bar"><span>Session (5 h) <small class="faint">resets 16:40</small></span><b><span data-lim>31</span>%</b><i style="--w: 0.31" data-lim-bar></i></div>
+                  <div class="bar"><span>Week <small class="faint">resets Mon 09:00</small></span><b>22%</b><i style="--w: 0.22"></i></div>
+                </div>
+                <div class="pn-sec">
+                  <div class="pn-h"><span>COST</span></div>
                   <div class="cost"><b>$<span data-cost>0.06</span></b> <span class="dim">session</span><span class="today">today <b>$4.12</b></span></div>
                   <svg class="curve" viewBox="0 0 220 36" preserveAspectRatio="none" aria-hidden="true">
                     <path data-curve d="M0 34 L40 33 L80 31 L120 30 L150 22 L175 26 L200 18 L220 16" fill="none" stroke="var(--accent)" stroke-width="1.5" vector-effect="non-scaling-stroke" />
                   </svg>
                 </div>
-                <div class="pn-sec">
-                  <div class="pn-h"><span>REPOSITORY</span><span><b class="green">+214</b> <b class="red">−38</b></span></div>
-                  <div class="git"><span class="accent">⎇ main</span></div>
-                  <div class="git"><b class="amber">M</b> index.html</div>
-                  <div class="git"><b class="amber">M</b> site.css</div>
-                  <div class="git"><b class="green">A</b> site.js</div>
+                <div class="pn-sec pn-fold">
+                  <div class="pn-h">
+                    <span><svg class="pn-chev" viewBox="0 0 8 8" width="8" height="8" aria-hidden="true"><path d="m2.5 1 3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.2" /></svg>TOUCHED FILES</span>
+                    <span><b class="green">+214</b> <b class="red">−38</b> · 3</span>
+                  </div>
                 </div>
                 <div class="pn-sec pn-last">
                   <div class="pn-h"><span>RECENT CHATS</span><span class="accent">6</span></div>
                   <div class="chat is-current"><b>Landing page motion</b><span>anthra-site · today</span></div>
-                  <div class="chat"><b>Release notes 0.7.2</b><span>anthra · yesterday</span></div>
+                  <div class="chat"><b>Fix the flaky login test</b><span>api-server · yesterday</span></div>
                 </div>
               </div>
 
@@ -263,7 +266,265 @@
               </div>
             </div>
           </div>
-          <p class="win-note" data-note>Rebuilt in HTML from Anthra 0.7. Numbers are illustrative.</p>
+          <p class="win-note" data-note>Rebuilt in HTML from Anthra 0.10. Numbers are illustrative.</p>
+        </div>
+      </section>
+
+      <section class="own" id="panel" aria-labelledby="panel-title">
+        <div class="wrap split">
+          <div>
+            <h2 id="panel-title" class="h-section">A panel of your own.</h2>
+            <p class="section-lede">
+              Drag its edge out to 640 px or half the window, and the charts show more. Keep the sections you read at the
+              top, fold the rest to one line that still shows its value, hide what you never look at. It comes back the
+              way you left it.
+            </p>
+            <dl class="secs">
+              <div>
+                <dt>Context over time</dt>
+                <dd>The context after every turn, the auto-compact threshold and each compaction, with a forecast of the next one: <em>in ~4 turns</em>.</dd>
+              </div>
+              <div>
+                <dt>Plan limits</dt>
+                <dd>For Pro and Max: the five-hour session and the week, with when each resets, as <code>/usage</code> shows them.</dd>
+              </div>
+              <div>
+                <dt>Budget and models</dt>
+                <dd>Today’s cost against your daily alert, the pace of the last hour, cost by model and what the prompt cache saved you.</dd>
+              </div>
+            </dl>
+            <p class="fine">
+              Turn rhythm and Session tools start hidden. Preferences → Panel lists every section to reorder, show or hide,
+              and <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> or the title-bar button hides the whole panel.
+            </p>
+          </div>
+
+          <div class="play" data-play>
+            <div class="play-stage" data-play-stage>
+              <div class="play-term" aria-hidden="true">
+                <i style="--l: 0.62"></i><i style="--l: 0.9"></i><i style="--l: 0.4"></i><i style="--l: 0.78"></i>
+                <i style="--l: 0.55"></i><i style="--l: 0.84"></i><i style="--l: 0.3"></i>
+              </div>
+              <div class="mini" data-mini>
+                <div
+                  class="mini-edge"
+                  data-edge
+                  role="separator"
+                  tabindex="0"
+                  aria-orientation="vertical"
+                  aria-label="Panel width"
+                  aria-valuemin="240"
+                  aria-valuemax="640"
+                  aria-valuenow="300"
+                >
+                  <span class="mini-width" data-width>300 px</span>
+                </div>
+                <div class="mini-list" data-mini-list>
+                  <section class="mini-sec" data-sec>
+                    <button class="mini-h" type="button" aria-expanded="true" aria-controls="ms-ctx">
+                      <svg class="pn-chev" viewBox="0 0 8 8" width="8" height="8" aria-hidden="true"><path d="m1 2.5 3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.2" /></svg>
+                      <span>Context over time</span><b class="mini-val">64%</b>
+                    </button>
+                    <div class="mini-body" id="ms-ctx">
+                      <div class="mini-in">
+                        <svg class="mini-chart" viewBox="0 0 240 60" preserveAspectRatio="none" aria-hidden="true">
+                          <path d="M0 8H240" stroke="var(--accent)" stroke-dasharray="3 3" opacity=".6" vector-effect="non-scaling-stroke" />
+                          <path d="M109 2V58" stroke="var(--text-faint)" stroke-dasharray="2 3" vector-effect="non-scaling-stroke" />
+                          <path d="M0 47 L22 41 L44 34 L65 28 L87 20 L109 12 L109 46 L131 41 L153 37 L175 33 L196 29 L218 26 L240 22" fill="none" stroke="var(--text)" stroke-width="1.5" vector-effect="non-scaling-stroke" />
+                          <path d="M240 22 L240 22" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" vector-effect="non-scaling-stroke" />
+                        </svg>
+                        <div class="mini-axis" aria-hidden="true"><span>turn 1</span><span>compacted</span><span>turn 12</span></div>
+                        <div class="kv"><span>Next compaction</span><b class="accent">in ~4 turns</b></div>
+                      </div>
+                    </div>
+                  </section>
+                  <section class="mini-sec" data-sec>
+                    <button class="mini-h" type="button" aria-expanded="true" aria-controls="ms-lim">
+                      <svg class="pn-chev" viewBox="0 0 8 8" width="8" height="8" aria-hidden="true"><path d="m1 2.5 3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.2" /></svg>
+                      <span>Plan limits</span><b class="mini-val">33%</b>
+                    </button>
+                    <div class="mini-body" id="ms-lim">
+                      <div class="mini-in mini-pair">
+                        <div>
+                          <div class="bar"><span>Session (5 h)</span><b>33%</b><i style="--w: 0.33"></i></div>
+                          <small class="faint">resets 16:40</small>
+                        </div>
+                        <div>
+                          <div class="bar"><span>Week</span><b>22%</b><i style="--w: 0.22"></i></div>
+                          <small class="faint">resets Mon 09:00</small>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+                  <section class="mini-sec" data-sec>
+                    <button class="mini-h" type="button" aria-expanded="true" aria-controls="ms-bud">
+                      <svg class="pn-chev" viewBox="0 0 8 8" width="8" height="8" aria-hidden="true"><path d="m1 2.5 3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.2" /></svg>
+                      <span>Budget and models</span><b class="mini-val">$4.12</b>
+                    </button>
+                    <div class="mini-body" id="ms-bud">
+                      <div class="mini-in">
+                        <div class="bar"><span>Today <small class="faint">of $10/day</small></span><b class="amber">$4.12</b><i style="--w: 0.41"></i></div>
+                        <div class="kv"><span>Pace, last hour</span><b>$1.10/h</b></div>
+                        <div class="kv mini-more"><span>Alert at this pace</span><b>17:40</b></div>
+                        <div class="mini-models">
+                          <div class="bar"><span>Opus</span><b>$3.40</b><i style="--w: 0.83"></i></div>
+                          <div class="bar"><span>Sonnet</span><b>$0.61</b><i style="--w: 0.15"></i></div>
+                          <div class="bar"><span>Haiku</span><b>$0.11</b><i style="--w: 0.03"></i></div>
+                        </div>
+                        <div class="kv"><span>Cache saved today</span><b class="green">$2.35</b></div>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+              </div>
+            </div>
+            <p class="play-hint">
+              Try it: drag the edge, click a title to fold it, <kbd>Alt</kbd>+<kbd>↑</kbd> or <kbd>↓</kbd> on a title to move it.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="tasks" id="tasks" aria-labelledby="tasks-title">
+        <div class="wrap">
+          <div class="split">
+            <h2 id="tasks-title" class="h-section">Two Claudes, one repository.</h2>
+            <div>
+              <p class="section-lede">
+                <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>N</kbd> starts a task: a tab on a new git worktree, with a folder and a
+                branch of its own. One session refactors while another fixes a bug, and neither writes over the other’s
+                files. The tab you started from keeps its branch and its changes.
+              </p>
+            </div>
+          </div>
+
+          <ol class="fork" data-reveal aria-label="A repository with three tasks, each closed a different way">
+            <li class="fk fk-base">
+              <span class="fk-tab"><span class="dot" data-status="unread"></span>anthra-site</span>
+              <code class="fk-br">main</code>
+              <span class="fk-line" aria-hidden="true"></span>
+              <span class="fk-end fk-keep">keeps its branch and its changes</span>
+            </li>
+            <li class="fk" style="--i: 1">
+              <span class="fk-tab"><span class="dot" data-status="working"></span>login-migration</span>
+              <code class="fk-br">anthra/login-migration <span class="fk-ahead">↑4</span></code>
+              <span class="fk-line" aria-hidden="true"></span>
+              <span class="fk-end fk-merge">Merge</span>
+            </li>
+            <li class="fk" style="--i: 2">
+              <span class="fk-tab"><span class="dot" data-status="waiting"></span>flaky-test</span>
+              <code class="fk-br">anthra/flaky-test <span class="fk-ahead">↑1</span></code>
+              <span class="fk-line" aria-hidden="true"></span>
+              <span class="fk-end fk-pr">Pull request</span>
+            </li>
+            <li class="fk" style="--i: 3">
+              <span class="fk-tab"><span class="dot"></span>cache-spike</span>
+              <code class="fk-br">anthra/cache-spike <span class="fk-ahead">↑2</span></code>
+              <span class="fk-line" aria-hidden="true"></span>
+              <span class="fk-end fk-drop">Discard</span>
+            </li>
+          </ol>
+
+          <dl class="ends">
+            <div>
+              <dt class="green">Merge</dt>
+              <dd>
+                Into whichever folder has the base checked out: a fast-forward when it can, a merge commit otherwise. It refuses
+                while anything is uncommitted, and a conflict undoes itself.
+              </dd>
+            </div>
+            <div>
+              <dt class="accent">Pull request</dt>
+              <dd>Pushes the branch and opens the pull request through the GitHub CLI. <em>Keep the folder</em> leaves the task open for the review.</dd>
+            </div>
+            <div>
+              <dt class="red">Discard</dt>
+              <dd>Only after a confirmation that counts the commits and changes you are about to throw away.</dd>
+            </div>
+          </dl>
+
+          <div class="tasks-notes">
+            <p>
+              <b>Git on every tab.</b> The branch of a task, commits ahead of and behind the base, and a mark while something
+              is uncommitted. The panel lists the files Claude touched with their <span class="green">+</span> and
+              <span class="red">−</span> counts; a click opens the diff since the tab started, commits included.
+            </p>
+            <p class="fine">
+              A task lives in <code>&lt;repository&gt;.worktrees\&lt;name&gt;</code> on the branch
+              <code>anthra/&lt;name&gt;</code> by default; Preferences → Tasks sets the prefix. Tasks need git on your PATH; pull requests also need the
+              <a href="https://cli.github.com">GitHub CLI</a>, logged in.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="recall" id="history" aria-labelledby="history-title">
+        <div class="wrap">
+          <div class="split">
+            <h2 id="history-title" class="h-section">Every chat, a shortcut away.</h2>
+            <p class="section-lede">
+              Anthra indexes every chat in every project in the background, so last week’s session is as close as the one in
+              front of you, whether its tab is open or long closed.
+            </p>
+          </div>
+
+          <div class="rc-grid">
+            <article class="rc">
+              <div class="rc-screen" aria-hidden="true">
+                <div class="rc-bar"><span>Timeline</span><span class="faint">Landing page motion</span></div>
+                <div class="tl-row"><time>14:02</time><span>Make the hero window straighten…</span><b>$0.09</b></div>
+                <div class="tl-row"><time>14:05</time><span>Now the same on phones</span><b>$0.21</b></div>
+                <div class="tl-mark">compacted · 171k before</div>
+                <div class="tl-row is-sel"><time>14:11</time><span>Why does the toast overlap…</span><b>$0.05</b></div>
+                <div class="tl-mark">model · Sonnet</div>
+                <div class="rc-foot"><span class="rc-btn">Resume</span></div>
+              </div>
+              <h3>Timeline of a session <span class="rc-keys"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd></span></h3>
+              <p>
+                One row per turn: when it started, the prompt, how long it took, what it cost, the tools it used and the files
+                it wrote. Open a row for the whole prompt, every tool call and the diff of each file. Closed chats open too,
+                with <em>Resume</em>.
+              </p>
+            </article>
+
+            <article class="rc">
+              <div class="rc-screen" aria-hidden="true">
+                <div class="rc-search"><span class="accent">&gt;</span> "auto-compact" -test<span class="caret"></span></div>
+                <div class="rc-chips"><span class="is-on">all projects</span><span>30 days</span><span>prompts</span></div>
+                <div class="sr-row">
+                  <span class="faint">anthra-site · 3 days ago</span>
+                  <span>move the <mark>auto-compact</mark> line under the ring</span>
+                </div>
+                <div class="sr-row">
+                  <span class="faint">api-server · last week</span>
+                  <span>why did it hit <mark>auto-compact</mark> so early?</span>
+                </div>
+              </div>
+              <h3>Search every chat <span class="rc-keys"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd></span></h3>
+              <p>
+                Prompts, answers, titles and tool calls, as you type. <code>"quotes"</code> match a phrase and
+                <code>-word</code> leaves it out; filter by project, period and kind. <kbd>Enter</kbd> opens the timeline at
+                that turn, <kbd>Ctrl</kbd>+<kbd>Enter</kbd> resumes the chat.
+              </p>
+            </article>
+
+            <article class="rc">
+              <div class="rc-screen" aria-hidden="true">
+                <div class="rc-chips"><span>7</span><span class="is-on">30</span><span>90 days</span><span>month</span><span>ever</span></div>
+                <div class="rc-weeks">
+                  <i style="--h: 0.42"></i><i style="--h: 0.68"></i><i style="--h: 0.35"></i><i style="--h: 0.9"></i><i style="--h: 0.57"></i>
+                </div>
+                <div class="kv"><span>anthra-site</span><b>$38.20</b></div>
+                <div class="kv"><span>api-server</span><b>$21.75</b></div>
+                <div class="rc-foot"><span class="rc-btn">Export CSV</span><span class="rc-btn">JSON</span></div>
+              </div>
+              <h3>Cost analysis <span class="rc-keys"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd></span></h3>
+              <p>
+                What you spent over 7, 30 or 90 days, this month or ever, by project, by model or by week. Export to CSV or
+                JSON; the CSV follows your Windows regional separators, so Excel opens it in columns.
+              </p>
+            </article>
+          </div>
         </div>
       </section>
 
@@ -296,6 +557,10 @@
             <p class="fine">
               Anthra is not code-signed yet, so SmartScreen warns once about the installer download. winget, Scoop and
               Anthra’s own updates don’t go through SmartScreen.
+            </p>
+            <p class="fine">
+              Needs <a href="https://claude.com/claude-code">Claude Code</a> on your PATH. Tasks also need git on your PATH,
+              and pull requests the <a href="https://cli.github.com">GitHub CLI</a>, logged in.
             </p>
           </div>
 
@@ -343,13 +608,46 @@
       <section class="privacy" id="privacy" aria-labelledby="privacy-title">
         <div class="wrap">
           <h2 id="privacy-title" class="h-statement">
-            Reads local files. <span class="dim-h">No telemetry, no analytics, no account.</span>
+            Runs on your machine. <span class="dim-h">No telemetry, no analytics, no account.</span>
           </h2>
+          <p class="section-lede privacy-lede">
+            It writes to your repositories only when you start or close a task, and goes online on its own only to check for
+            updates.
+          </p>
           <dl class="reads" data-reveal>
-            <div><dt><code>~/.claude</code></dt><dd>Claude Code’s transcripts, for context, tokens and cost</dd></div>
-            <div><dt><code>git status</code></dt><dd>of each tab’s directory</dd></div>
-            <div><dt><code>%APPDATA%\Anthra</code></dt><dd>its own state: windows, tabs, preferences</dd></div>
-            <div><dt><code>github.com</code></dt><dd>the one request it makes on its own: the update check, sending nothing beyond what any download does</dd></div>
+            <div>
+              <dt><code>~/.claude</code></dt>
+              <dd>Claude Code’s transcripts, for context, tokens and cost. Your Claude Code settings files are read, never written.</dd>
+            </div>
+            <div>
+              <dt><code>127.0.0.1</code></dt>
+              <dd>
+                where the status line script and the hooks that ship with Anthra send what Claude Code hands them, in
+                Anthra’s own tabs only. Loopback, never the network. Your own status line still runs.
+              </dd>
+            </div>
+            <div>
+              <dt><code>%APPDATA%\Anthra</code></dt>
+              <dd>
+                its own state, and a history index cache with the text of prompts, answers and tool calls, never tool output.
+                Preferences → History switches it off and deletes it.
+              </dd>
+            </div>
+            <div>
+              <dt><code>git</code></dt>
+              <dd>
+                the status of each tab’s directory. With tasks, and only on your action, worktrees, branches and merges in
+                your repositories.
+              </dd>
+            </div>
+            <div>
+              <dt><code>gh</code></dt>
+              <dd>runs only when you ask for a pull request: it pushes the task’s branch and opens the pull request on GitHub.</dd>
+            </div>
+            <div>
+              <dt><code>github.com</code></dt>
+              <dd>the one request Anthra makes on its own: the update check, sending nothing beyond what any download does</dd>
+            </div>
           </dl>
         </div>
       </section>
@@ -358,6 +656,21 @@
         <div class="wrap split">
           <h2 id="faq-title" class="h-section">Straight answers.</h2>
           <div class="faq-list">
+            <details>
+              <summary>Does it change my Claude Code setup?</summary>
+              <div class="faq-body">
+                <p>
+                  Not your files. Anthra reads your Claude Code settings files and never writes them. In its own tabs it starts
+                  <code>claude</code> with a <code>--settings</code> file that adds a status line and a few hooks, so
+                  <code>claude</code> in any other terminal is untouched.
+                </p>
+                <p>
+                  The status line script ships with Anthra. It sends what Claude Code hands it to <code>127.0.0.1</code> and
+                  nowhere else, then runs your own status line as before. That is where Plan limits come from: on by default,
+                  off in Preferences → Panel.
+                </p>
+              </div>
+            </details>
             <details>
               <summary>Why does SmartScreen warn me?</summary>
               <div class="faq-body">
@@ -375,14 +688,10 @@
                   No, they are estimates from a local rate table. On a subscription they are the API-equivalent cost of what
                   you used.
                 </p>
-              </div>
-            </details>
-            <details>
-              <summary>Does it change my Claude Code setup?</summary>
-              <div class="faq-body">
                 <p>
-                  No. Anthra never writes to Claude Code’s configuration. It starts <code>claude</code> in a real PowerShell
-                  and reads the transcripts Claude Code already writes.
+                  Since 0.9 they match what Claude Code’s <code>/cost</code> reports, a little under it because a few calls
+                  never reach the transcript. Earlier versions counted some responses more than once and showed about 2.4
+                  times too much, so expect lower numbers than you remember.
                 </p>
               </div>
             </details>
@@ -392,6 +701,12 @@
                 <p>
                   Uninstall it from Windows Settings (or <code>winget uninstall iFrosty-tech.Anthra</code>,
                   <code>scoop uninstall anthra</code>), then delete <code>%APPDATA%\Anthra</code>.
+                </p>
+                <p>
+                  Closing a task removes its folder unless you choose to keep it. What can stay in your repositories are the
+                  folders of tasks still open or kept, in <code>&lt;repository&gt;.worktrees\&lt;name&gt;</code>, and the task
+                  branches, <code>anthra/*</code> by default, since only a discard deletes one. Remove them with
+                  <code>git worktree remove</code> and <code>git branch -D</code>.
                 </p>
               </div>
             </details>
@@ -425,6 +740,7 @@
         <span class="foot-meta">MIT license · Windows 10 and 11 · for <a href="https://claude.com/claude-code">Claude Code</a></span>
         <span class="foot-links">
           <a href="https://github.com/iFrosty-tech/anthra">GitHub</a>
+          <a href="https://github.com/iFrosty-tech/anthra/blob/main/CHANGELOG.md">Changelog</a>
           <a href="https://github.com/iFrosty-tech/anthra/issues">Report a bug</a>
           <a href="https://github.com/iFrosty-tech/anthra#privacy">Privacy</a>
         </span>
