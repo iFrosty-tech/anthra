@@ -5,6 +5,59 @@ All notable changes to Anthra. The format follows
 [semantic versioning](https://semver.org/). Each section is also the body of its
 GitHub release and what the "What's new" window shows after an update.
 
+## [0.11.0] — 2026-09-21
+
+*"A terminal you can read."*
+
+### Added
+- **The session as a conversation.** Every tab now has two views over the same live session: the
+  conversation and the terminal. `Ctrl+Shift+J`, the selector in the header or the tab's menu
+  switch between them, and new tabs open on the conversation. Claude Code keeps running in its own
+  terminal underneath the whole time — the conversation is a lens on it, built from the transcript
+  Anthra already reads, never a client of its own.
+  - **A card per turn and per tool**: your prompt, the answer in markdown, and what Claude did.
+    *Edit* and *Write* with the diff, line numbers and `+N −M`; a click on the path opens the diff
+    viewer. *Bash* with the command, how long it took, how it ended and the last lines of its
+    output. Reads, greps and globs take a line each and gather into one row when they follow one
+    another. Subagents, task lists, web fetches and MCP tools have their own rows, and a tool that
+    fails says why.
+  - **Live**: a card appears when its tool starts, with a stopwatch, and completes when it does;
+    while a turn runs, a line at the bottom says `Working… · Esc interrupts · 6.2s`. The view stays
+    at the end unless you scroll up, and then a "↓ new messages" button brings you back.
+  - **Resuming a chat** shows the last 30 turns, with "load earlier turns" at the top; compactions,
+    `/clear`, model and permission-mode changes are separators in the flow.
+- **A composer under the conversation.** A real multi-line field: `Enter` sends, `Shift+Enter` goes
+  to a new line. `/` opens the commands — Claude Code's own, plus the project's, yours and those of
+  your plugins, with their description — and `@` the files of the project; `↑` and `↓` on an empty
+  field walk the prompts of the session. `Esc`, `Shift+Tab` and `Ctrl+C` go to Claude Code as the
+  keys they are. Files dropped or pasted become their paths, as in the terminal, and a counter
+  estimates the tokens of what you have written.
+  - What the composer sends is **typed, never pasted**: Claude Code receives exactly what you wrote,
+    so a long prompt arrives whole instead of as an attachment.
+- **The terminal when it's needed.** The tab moves to the terminal by itself when Claude Code asks
+  something only its own screen can show — a permission, a question, a plan to approve, an
+  interactive command like `/model` sent from the composer — and it takes the keyboard with it. When
+  the prompt comes back, the tab returns to the conversation **if it went there on its own**: a
+  terminal you chose stays. A line in the conversation says what was asked and that it was answered
+  there. **Preferences → Conversation** turns the whole thing off.
+- **A frame around the session.** Above the view, the model, the permission mode, how long the
+  session has been going and the context used; below it, the shortcuts of the view you are on. Hide
+  it in **Preferences → Appearance**.
+- **Preferences → Conversation**: which view new tabs open on, and whether the terminal may come
+  forward by itself.
+
+### Changed
+- Claude Code's own colours are now readable on the light theme: what it draws keeps its meaning
+  instead of fading into the background.
+- `Shift+Enter` in the terminal goes to a new line, as Claude Code expects.
+- Line numbers in a diff are readable on all three themes, in the conversation and in the diff
+  viewer.
+
+### Fixed
+- Claude Code 2.1.278 no longer offers `esc to interrupt` while it works, which left the tab's dot,
+  the taskbar and the panel thinking every turn was over as soon as it started. Anthra now reads the
+  spinner over the prompt box.
+
 ## [0.10.0] — 2026-09-19
 
 ### Added

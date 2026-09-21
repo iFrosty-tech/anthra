@@ -812,14 +812,41 @@ h1 {
 }
 .term-top {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 12px;
   height: 32px;
   padding: 0 12px;
   border-bottom: 1px solid var(--border-soft);
   color: var(--text-faint);
   font-size: 12px;
 }
+
+/* The switch between the two views of one session, in the window and in the glimpse. */
+.view-pick {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: auto;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1.45;
+}
+.view-pick b,
+.view-pick i {
+  padding: 0 7px;
+  border-radius: 4px;
+  font-style: normal;
+  font-weight: 400;
+}
+.view-pick b {
+  background: var(--surface-3);
+  color: var(--text);
+}
+.view-pick i {
+  color: var(--text-faint);
+}
+
 .badge-model {
   padding: 1px 8px;
   border: 1px solid var(--accent-line);
@@ -1106,6 +1133,7 @@ h1 {
 
 /* ---------- Sections ---------- */
 
+.talk,
 .own,
 .tasks,
 .recall,
@@ -1154,6 +1182,253 @@ h1 {
 .fine code,
 .section-lede code {
   color: var(--text-dim);
+}
+
+/* Conversation: a glimpse of the view beside what it is made of. */
+.talk-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  gap: clamp(32px, 5vw, 72px);
+  align-items: start;
+  margin: clamp(56px, 7vw, 88px) 0 0;
+}
+.talk-grid .secs {
+  margin-top: 0;
+}
+
+.cv {
+  position: sticky;
+  top: calc(var(--nav-h) + 28px);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-deep);
+  box-shadow: 0 40px 80px -40px rgba(0, 0, 0, 0.8);
+  font: 12.5px/1.6 var(--mono);
+}
+.cv-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-soft);
+  color: var(--text-faint);
+  font-size: 11.5px;
+}
+.cv-meta {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cv-flow {
+  display: grid;
+  gap: 10px;
+  padding: 14px 14px 0;
+}
+.cv-ask {
+  margin: 0;
+  padding: 8px 11px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-weight: 500;
+}
+.cv-said {
+  display: flex;
+  gap: 9px;
+  padding: 0 2px;
+}
+.cv-said b {
+  color: #d97757;
+  font-weight: 400;
+}
+.cv-said p {
+  margin: 0;
+  color: var(--text-dim);
+  font: 14px/1.55 var(--sans);
+}
+.cv-card {
+  overflow: hidden;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.cv-card.is-live {
+  border-color: var(--accent-line);
+}
+.cv-card-h {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  color: var(--text-dim);
+}
+.cv-card-h code {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cv-kind {
+  flex: none;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: var(--surface-3);
+  color: var(--text-dim);
+  font-size: 11px;
+}
+.cv-count {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  color: var(--text-faint);
+  font-size: 11.5px;
+}
+.cv-count b {
+  font-weight: 400;
+}
+.cv-tick {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.js.motion .cv-tick {
+  animation: tick 1.9s var(--ease-out) infinite;
+}
+@keyframes tick {
+  from {
+    box-shadow: 0 0 0 0 rgba(155, 140, 247, 0.45);
+  }
+  to {
+    box-shadow: 0 0 0 7px rgba(155, 140, 247, 0);
+  }
+}
+.cv-hunk {
+  border-top: 1px solid var(--border-soft);
+  background: var(--bg-deep);
+  font-size: 11.5px;
+}
+.cv-hunk div {
+  overflow: hidden;
+  padding: 2px 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cv-hunk i {
+  display: inline-block;
+  width: 30px;
+  color: var(--text-faint);
+  font-style: normal;
+}
+.cv-del {
+  background: rgba(224, 108, 117, 0.11);
+  color: #eda6ac;
+}
+.cv-add {
+  background: rgba(110, 192, 138, 0.11);
+  color: #9ed8b2;
+}
+.cv-row {
+  overflow: hidden;
+  padding: 0 2px;
+  color: var(--text-faint);
+  font-size: 11.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cv-row code {
+  color: var(--text-dim);
+}
+.cv-work {
+  margin: 0 0 4px 2px;
+  color: var(--text-faint);
+  font-size: 11.5px;
+}
+
+.cv-comp {
+  margin: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.cv-menu {
+  padding: 6px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.cv-menu div {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 10px;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.cv-menu div.is-on {
+  background: var(--surface-3);
+}
+.cv-menu b {
+  color: var(--accent);
+  font-size: 11.5px;
+  font-weight: 400;
+}
+.cv-menu span {
+  overflow: hidden;
+  color: var(--text-dim);
+  font: 12px/1.6 var(--sans);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cv-field {
+  padding: 10px 11px 12px;
+  color: var(--text);
+}
+.cv-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 11px;
+  border-top: 1px solid var(--border-soft);
+  color: var(--text-faint);
+  font-size: 11px;
+}
+.cv-foot b {
+  color: var(--accent-dim);
+  font-weight: 400;
+}
+
+/* The glimpse assembles itself once, top to bottom. */
+.cv-flow > *,
+.cv-comp {
+  transition:
+    opacity 0.6s var(--ease-out),
+    transform 0.8s var(--ease-out);
+}
+.js.motion .cv:not(.in) .cv-flow > *,
+.js.motion .cv:not(.in) .cv-comp {
+  opacity: 0;
+  transform: translateY(12px);
+}
+.cv-flow > :nth-child(2) {
+  transition-delay: 0.08s;
+}
+.cv-flow > :nth-child(3) {
+  transition-delay: 0.16s;
+}
+.cv-flow > :nth-child(4) {
+  transition-delay: 0.24s;
+}
+.cv-flow > :nth-child(5) {
+  transition-delay: 0.32s;
+}
+.cv-flow > :nth-child(6) {
+  transition-delay: 0.4s;
+}
+.cv-comp {
+  transition-delay: 0.48s;
 }
 
 /* Updates timeline: a rule that draws itself, four stops on it. */
@@ -2005,6 +2280,12 @@ mark {
 .reads div:nth-child(6) {
   transition-delay: 0.5s;
 }
+.reads div:nth-child(7) {
+  transition-delay: 0.6s;
+}
+.reads div:nth-child(8) {
+  transition-delay: 0.7s;
+}
 
 /* FAQ */
 .faq-list {
@@ -2227,12 +2508,32 @@ details[open]::details-content {
   order: 3;
 }
 
+/* Eight section links need the room the wide nav takes. */
+@media (max-width: 1060px) {
+  .nav {
+    gap: 16px;
+  }
+  .nav nav {
+    gap: 0;
+  }
+  .nav nav a {
+    padding: 6px 8px;
+  }
+}
+
 @media (max-width: 860px) {
   .nav nav {
     display: none;
   }
   .split {
     grid-template-columns: 1fr;
+  }
+  .talk-grid {
+    grid-template-columns: 1fr;
+  }
+  .cv {
+    position: static;
+    max-width: 560px;
   }
   .timeline {
     grid-template-columns: 1fr 1fr;
@@ -2274,12 +2575,25 @@ details[open]::details-content {
   .rc {
     max-width: 560px;
   }
+  .talk-grid {
+    gap: 44px;
+  }
   .foot-links {
     margin-left: 0;
   }
 }
 
 @media (max-width: 520px) {
+  .cv {
+    font-size: 11.5px;
+  }
+  .cv-menu div {
+    grid-template-columns: 78px minmax(0, 1fr);
+    gap: 8px;
+  }
+  .cv-meta {
+    display: none;
+  }
   h1 {
     font-size: clamp(2rem, 1rem + 5.4vw, 2.5rem);
     font-stretch: 100%;
