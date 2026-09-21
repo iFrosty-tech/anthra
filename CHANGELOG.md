@@ -5,6 +5,38 @@ All notable changes to Anthra. The format follows
 [semantic versioning](https://semver.org/). Each section is also the body of its
 GitHub release and what the "What's new" window shows after an update.
 
+## [0.11.1] — 2026-09-21
+
+*"Answering from the conversation."*
+
+### Added
+- **Answer Claude Code without leaving the conversation.** When Claude asks for something, a card
+  appears at the end of the turn and the tab stays where it is.
+  - **Permissions**: what Claude wants to do — the command with its description, the diff an *Edit*
+    or *Write* would make, the page it wants to read, the input of any other tool — with *Allow*,
+    the "always allow" options Claude Code itself suggests (for this session, in this project, in
+    every project), *Deny* and *Deny and stop Claude*.
+  - **Questions**: the options of `AskUserQuestion` to click, one answer or several, and *Other* for
+    an answer of your own.
+  - **Plans**: the plan in markdown with *Approve and accept edits*, *Approve* and *Keep planning*,
+    with an optional note on what should change.
+  - **From the keyboard**: the card takes the focus when its tab is the one in front; `1`–`9` pick a
+    choice, `Enter` the first one, `Esc` declines. With a draft in the composer the focus stays there
+    and `Shift+Tab` takes you to the card; what you write waits until the request is answered.
+- **The terminal stays the fallback.** Claude Code's own dialog stays open in the terminal the whole
+  time a card waits, and the first answer counts, from either side. *Answer in the terminal* takes
+  you there and brings you back afterwards. Anthra never answers on its own: a closed tab, an error
+  or an unreadable request leave the decision to the terminal, exactly as in 0.11.0. Cards need
+  Claude Code 2.1.278 or later.
+- **Preferences → Conversation → Answer Claude Code from the conversation**, on by default. Off,
+  every request goes to the terminal as before.
+
+### Changed
+- The tab turns to *waiting* the moment Claude asks, not seconds later, and the Windows notification
+  says what is being asked: the command, the file, the question.
+- A tool call you denied, or a question you left unanswered, reads "denied", "sent back" or "not
+  answered" in the conversation instead of showing as a failure.
+
 ## [0.11.0] — 2026-09-21
 
 *"A terminal you can read."*

@@ -111,8 +111,8 @@
               <h2>The terminal, underneath</h2>
               <p>
                 PowerShell on ConPTY, not an emulation: Claude Code keeps running in it the way it always has. A permission,
-                a question or a plan to approve brings it forward by itself, and it hands the tab back to the conversation
-                when the prompt returns.
+                a question or a plan gets a card in the conversation; an interactive command like <code>/model</code> brings
+                the terminal forward by itself, and it hands the tab back to the conversation when the prompt returns.
               </p>
               <p class="caption-meta"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>J</kbd> changes view · <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd> puts two sessions side by side</p>
             </li>
@@ -127,8 +127,9 @@
             <li class="caption" data-step="4">
               <h2>Look away. Anthra calls you back.</h2>
               <p>
-                A Windows toast and a taskbar badge when Claude waits for a permission or finishes a turn, only for tabs
-                you are not looking at. Click it and you land on that tab.
+                A Windows toast and a taskbar badge when Claude asks for something or finishes a turn, only for tabs
+                you are not looking at. The toast says what is asked, the command to run or the file to edit, and a click
+                lands you on that tab.
               </p>
               <p class="caption-meta">Throttled per tab, so a long session never turns into noise</p>
             </li>
@@ -353,7 +354,7 @@
                 <div class="toast" data-toast>
                   <div class="toast-app"><img src="icon.png" alt="" width="16" height="16" /> Anthra</div>
                   <b>api-server</b>
-                  <span>Claude needs your permission</span>
+                  <span>Claude wants to run: npm test</span>
                 </div>
               </div>
 
@@ -472,21 +473,43 @@
                   </dd>
                 </div>
                 <div>
+                  <dt>A card when Claude asks</dt>
+                  <dd>
+                    The tab stays where it is and the request appears at the end of the turn. A permission shows what Claude
+                    wants to do: the command with its description, the diff an <em>Edit</em> or <em>Write</em> would make, the
+                    page to read. Answer with <em>Allow</em>, an <em>always allow</em> that Claude Code itself suggests,
+                    <em>Deny</em>, or <em>Deny and stop Claude</em>. A question takes one answer, several, or <em>Other</em>; a
+                    plan arrives in markdown, to approve with or without accepting edits, or to send back to planning with
+                    an optional note on what to change. <kbd>1</kbd>–<kbd>9</kbd> pick, <kbd>Enter</kbd> takes the first
+                    choice, <kbd>Esc</kbd> declines, and <kbd>Shift</kbd>+<kbd>Tab</kbd> moves there from a draft in the
+                    composer.
+                  </dd>
+                </div>
+                <div>
                   <dt>The terminal, when it is needed</dt>
                   <dd>
-                    A permission, a question, a plan to approve, an interactive command like <code>/model</code>: the tab
-                    moves to the terminal by itself and takes the keyboard with it. When the prompt comes back it returns to
-                    the conversation — if it went there on its own. A terminal you chose stays, and a line in the conversation
-                    says what was asked and that it was answered there.
+                    An interactive command like <code>/model</code>, or a request without a card: the tab moves to the
+                    terminal by itself and takes the keyboard with it. When the prompt comes back it returns to the
+                    conversation — if it went there on its own; a terminal you chose stays. A line in the conversation says
+                    what was asked and whether it was answered on the terminal or is still waiting there. While a card
+                    waits, Claude Code’s own dialog stays open in the terminal and the first answer from either side
+                    counts; <em>Answer in the terminal</em> takes you there and back. Anthra never answers for you: a
+                    closed tab, an error or a request it can’t read leaves the choice to the terminal.
                   </dd>
                 </div>
               </dl>
               <p class="fine">
                 Resuming a chat shows the last 30 turns, with <em>load earlier turns</em> at the top, and a long session opens
                 without keeping you waiting. Compactions, <code>/clear</code> and every change of model or permission mode are
-                separators in the flow. New tabs open on the conversation; Preferences → Conversation changes that and stops
-                the terminal coming forward on its own, and Preferences → Appearance hides the frame around the session, both
+                separators in the flow. New tabs open on the conversation; Preferences → Conversation changes that, and its
+                <em>Show the terminal when Claude Code asks something</em> decides whether the terminal comes forward on its
+                own. Preferences → Appearance hides the frame around the session, both
                 halves of it: the header above the view and the shortcut bar under it.
+              </p>
+              <p class="fine">
+                Cards need Claude Code 2.1.278 or later. With an older one, or with <em>Answer Claude Code from the
+                conversation</em> turned off in Preferences → Conversation, where it is on by default, every request is
+                answered in the terminal.
               </p>
             </div>
           </div>
@@ -840,18 +863,23 @@
           </h2>
           <p class="section-lede privacy-lede">
             It writes to your repositories only when you start or close a task, and goes online on its own only to check for
-            updates.
+            updates. An <em>always allow</em> you pick on a card is saved by Claude Code, not Anthra, in its own settings,
+            which can be the repository’s <code>.claude</code> folder.
           </p>
           <dl class="reads" data-reveal>
             <div>
               <dt><code>~/.claude</code></dt>
-              <dd>Claude Code’s transcripts, for context, tokens and cost. Your Claude Code settings files are read, never written.</dd>
+              <dd>
+                Claude Code’s transcripts, for context, tokens and cost. Your Claude Code settings files are read, never
+                written by Anthra; an <em>always allow</em> from a card is written by Claude Code, as from its own dialog.
+              </dd>
             </div>
             <div>
               <dt><code>127.0.0.1</code></dt>
               <dd>
                 where the status line script and the hooks that ship with Anthra send what Claude Code hands them, in
-                Anthra’s own tabs only. Loopback, never the network. Your own status line still runs.
+                Anthra’s own tabs only. The same hooks carry your answer on a card back to Claude Code. Loopback, never
+                the network. Your own status line still runs.
               </dd>
             </div>
             <div>
@@ -901,7 +929,8 @@
                 <p>
                   Not your files. Anthra reads your Claude Code settings files and never writes them. In its own tabs it starts
                   <code>claude</code> with a <code>--settings</code> file that adds a status line and a few hooks, so
-                  <code>claude</code> in any other terminal is untouched.
+                  <code>claude</code> in any other terminal is untouched. When you pick an <em>always allow</em> on a card,
+                  Claude Code saves the rule itself, just as it would from its own dialog.
                 </p>
                 <p>
                   The status line script ships with Anthra. It sends what Claude Code hands it to <code>127.0.0.1</code> and
@@ -921,8 +950,9 @@
                 <p>
                   What you send from the composer is typed into that terminal as if you had typed it there, which is why
                   <kbd>Esc</kbd>, <kbd>Shift</kbd>+<kbd>Tab</kbd> and <kbd>Ctrl</kbd>+<kbd>C</kbd> reach Claude Code as the
-                  keys they are. Permissions, plans and anything else only its own screen can draw are answered in the
-                  terminal, and the tab goes there to ask.
+                  keys they are. A permission, a question or a plan is answered on a card in the conversation, and
+                  Anthra’s hooks hand your answer back to that same Claude Code; a request without a card is answered in
+                  the terminal.
                 </p>
               </div>
             </details>
@@ -962,6 +992,10 @@
                   folders of tasks still open or kept, in <code>&lt;repository&gt;.worktrees\&lt;name&gt;</code>, and the task
                   branches, <code>anthra/*</code> by default, since only a discard deletes one. Remove them with
                   <code>git worktree remove</code> and <code>git branch -D</code>.
+                </p>
+                <p>
+                  An <em>always allow</em> picked on a card is a rule in Claude Code’s settings, in the repository’s
+                  <code>.claude</code> folder or in <code>~/.claude</code>, and it stays after Anthra is gone.
                 </p>
               </div>
             </details>
