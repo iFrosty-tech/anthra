@@ -2,12 +2,14 @@
 
 # `>_` Anthra
 
-**The terminal that opens already inside Claude Code.**
+**A terminal you can read.**
 
-Open a directory and Claude Code is running. Beside it, a panel shows how much context
-you are burning, what the session costs, your plan limits and which tab needs you.
+Open a directory and Claude Code is running. Every tab has two views on that same live
+session — a conversation, turn by turn, and the terminal underneath it — plus a panel
+that shows how much context you are burning, what the session costs, your plan limits
+and which tab needs you.
 
-<img src="screenshot.png" alt="Anthra with three tabs and their status, Claude Code in the terminal and the metrics panel on the right" width="100%">
+<img src="screenshot.png" alt="Anthra showing the conversation view of a session, with cards for Claude's turns and tool calls, and the metrics panel on the right" width="100%">
 
 </div>
 
@@ -16,6 +18,30 @@ and ideas in [Issues](https://github.com/iFrosty-tech/anthra/issues).
 
 ## Features
 
+- **Conversation view**, alongside the terminal — `Ctrl+Shift+J`, the header selector or
+  the tab menu switch between them, and new tabs open on the conversation. Claude Code
+  keeps running in its terminal underneath the whole time: the conversation is a lens on
+  that session, not a client of its own. A card per turn and per tool — *Edit* and *Write*
+  with their diff and `+N −M`, *Bash* with its command, duration and outcome, reads and
+  greps grouped when they run in a row — live, appearing with a timer the moment a tool
+  starts; resuming a chat shows the last 30 turns, with *load earlier turns* at the top.
+  Preferences → Conversation sets which view new tabs open on; Preferences → Appearance
+  hides the session frame above the view and that view's shortcuts below.
+- **The terminal steps forward on its own** whenever Claude Code needs a permission, a
+  question, a plan to approve, or runs an interactive command like `/model` sent from the
+  composer — and takes the keyboard with it. Once the prompt returns, the tab goes back to
+  the conversation only if it got there on its own, so a terminal you chose stays put; the
+  conversation keeps a line for what was asked and how it was answered there. Preferences →
+  Conversation can switch this off entirely.
+- **Composer** under the conversation: `Enter` sends, `Shift+Enter` starts a new line, `/`
+  opens commands and skills — Claude Code's own, the project's, yours and plugins', each
+  with its description — and `@` opens the project's files. `↑`/`↓` on an empty field
+  scroll through the session's past prompts, and `Esc`, `Shift+Tab` and `Ctrl+C` reach
+  Claude Code as the keys they are. Dropped or pasted files become their path, as in the
+  terminal, and a counter estimates the tokens of what you typed. What the composer sends
+  is typed, never pasted — Claude Code gets exactly what you wrote, so a long prompt
+  arrives whole instead of as an attachment — though an image from the clipboard still
+  needs the terminal, since the composer does not accept it.
 - **Live panel** for context, token breakdown, cost and plan limits (Pro and Max), resizable
   and rearrangeable — sections reorder, show or hide from Preferences → Panel (or drag by
   title / Alt+↑/↓); a click on a section title folds it.
@@ -64,7 +90,11 @@ transcripts under `~/.claude`, the git status of each tab's directory and its ow
 `%APPDATA%\Anthra`, which also holds
 a history index cache (`history-cache`) with the text of your prompts, Claude's answers
 and the names and targets of the tool calls — never what the tools returned. Switching
-it off in Preferences → History deletes the cache.
+it off in Preferences → History deletes the cache. The `/` menu in the composer reads the
+name and description of the project's, your own and enabled plugins' commands and skills
+(under `~/.claude` and the project's own `.claude`); the `@` menu lists the project's
+files with `git ls-files`, or a shallow walk of the directory when it is not a repository.
+Both read-only: nothing runs, nothing leaves the machine.
 
 For tasks, Anthra creates git worktrees and branches and runs merges in your
 repositories; it pushes a branch and opens a pull request only when you ask it to, when

@@ -3,16 +3,16 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Anthra — the terminal that opens inside Claude Code</title>
+    <title>Anthra — a terminal you can read</title>
     <meta
       name="description"
-      content="A Windows terminal that opens straight into Claude Code, with a live panel for context, cost and plan limits, parallel tasks on git worktrees, and search across every chat."
+      content="A Windows terminal for Claude Code. Every tab holds one live session in two views: the conversation and the terminal it runs in, with a panel for context, cost and plan limits, tasks on git worktrees and search across every chat."
     />
     <meta name="theme-color" content="#17171b" />
-    <meta property="og:title" content="Anthra — the terminal that opens inside Claude Code" />
+    <meta property="og:title" content="Anthra — a terminal you can read" />
     <meta
       property="og:description"
-      content="Open a directory and Claude Code is running. Beside it, a live panel for context, cost, git and recent chats."
+      content="Open a directory and Claude Code is running. Read the session as a conversation, or drop into the terminal it runs in. One keystroke apart, one session underneath."
     />
     <meta property="og:image" content="https://ifrosty-tech.github.io/anthra/screenshot.png" />
     <link rel="icon" href="icon.png" />
@@ -38,6 +38,7 @@
       </a>
       <nav aria-label="Sections">
         <a href="#inside">Inside</a>
+        <a href="#conversation">Conversation</a>
         <a href="#panel">Panel</a>
         <a href="#tasks">Tasks</a>
         <a href="#history">History</a>
@@ -63,10 +64,11 @@
       <section class="story" data-story aria-labelledby="hero-title">
         <div class="stage" data-stage>
           <div class="hero" data-hero>
-            <h1 id="hero-title">The terminal that opens already inside&nbsp;Claude&nbsp;Code.</h1>
+            <h1 id="hero-title">A terminal you can&nbsp;read.</h1>
             <p class="lede">
-              Open a directory and Claude Code is running. Beside it, a panel shows how much context you are
-              burning, what the session costs and which tab needs you, without asking.
+              Open a directory and Claude Code is running. Read the session as a conversation, or drop into the
+              terminal it runs in: one keystroke apart, one session underneath. Beside them, a panel for context,
+              cost and the tab that needs you.
             </p>
             <div class="hero-actions">
               <a class="btn" href="https://github.com/iFrosty-tech/anthra/releases/latest">
@@ -101,12 +103,13 @@
               <p class="caption-meta"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd> new tab · windows, tabs and chats come back on launch</p>
             </li>
             <li class="caption" data-step="1">
-              <h2>A real shell, with Claude already in it</h2>
+              <h2>A real shell, and a conversation over it</h2>
               <p>
-                PowerShell on ConPTY, not an emulation. Anthra runs <code>claude</code> in the directory you opened, and when
-                Claude Code exits the shell stays, so you can restart it or do something else.
+                PowerShell on ConPTY, not an emulation: Anthra runs <code>claude</code> in the directory you opened, and when
+                Claude Code exits the shell stays. The same session reads two ways — the conversation, a card for every turn
+                and every tool, and the terminal Claude Code is really running in.
               </p>
-              <p class="caption-meta"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd> puts two sessions side by side, still split on the next launch</p>
+              <p class="caption-meta"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>J</kbd> changes view · <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd> puts two sessions side by side</p>
             </li>
             <li class="caption" data-step="2">
               <h2>Context and cost, live</h2>
@@ -133,13 +136,13 @@
             <button type="button" data-goto="3">Toasts</button>
           </nav>
 
-          <!-- The window, rebuilt in HTML from Anthra 0.10; every layer is one feature. -->
+          <!-- The window, rebuilt in HTML from Anthra 0.11; every layer is one feature. -->
           <div class="viewport" data-viewport>
             <div
               class="win"
               data-win
               role="img"
-              aria-label="Anthra running: three tabs with their status and git marks, one of them a task, Claude Code answering in the terminal, the panel on the right with context over time and plan limits, and a Windows notification"
+              aria-label="Anthra running: three tabs with their status and git marks, one of them a task; above the session the model, its permission mode, the time it has been going, the context used and the switch between the conversation and the terminal; Claude Code answering in the terminal; the panel on the right with context over time and plan limits; and a Windows notification"
             >
               <div class="layer l-frame" data-layer="frame">
                 <div class="titlebar">
@@ -157,8 +160,8 @@
                   </span>
                 </div>
                 <div class="hintbar">
-                  <span><b>↵</b> send</span><span><b>⇧↵</b> new line</span><span><b>/</b> commands</span><span><b>@</b> file</span>
-                  <span class="hint-right"><b>ctrl+shift+t</b> new tab</span><span><b>ctrl+shift+b</b> metrics panel</span>
+                  <span><b>↵</b> send</span><span><b>⇧↵</b> new line</span><span><b>/</b> commands</span><span><b>@</b> file</span><span><b>⇧tab</b> mode</span><span><b>esc</b> interrupt</span>
+                  <span class="hint-right"><b>ctrl+shift+j</b> conversation</span><span><b>ctrl+shift+t</b> new tab</span><span><b>ctrl+shift+b</b> metrics panel</span>
                 </div>
               </div>
 
@@ -176,7 +179,8 @@
               <div class="layer l-term" data-layer="1">
                 <div class="term-top">
                   <span class="badge-model">Opus 5 <i>plan</i></span>
-                  <span class="term-clock">session <span data-clock>00:02:41</span></span>
+                  <span class="term-clock">session <span data-clock>00:02:41</span> · 58% context</span>
+                  <span class="view-pick"><i>chat</i><b>terminal</b></span>
                 </div>
                 <div class="term-body">
                   <div class="cc-head">
@@ -266,7 +270,126 @@
               </div>
             </div>
           </div>
-          <p class="win-note" data-note>Rebuilt in HTML from Anthra 0.10. Numbers are illustrative.</p>
+          <p class="win-note" data-note>Rebuilt in HTML from Anthra 0.11. Numbers are illustrative.</p>
+        </div>
+      </section>
+
+      <!-- The conversation: a glimpse of the view, then what it is made of. -->
+      <section class="talk" id="conversation" aria-labelledby="conversation-title">
+        <div class="wrap">
+          <div class="split">
+            <h2 id="conversation-title" class="h-section">The same session, read two ways.</h2>
+            <p class="section-lede">
+              Claude Code keeps running in the terminal of that tab, the way it always has. The conversation is a second
+              view on that same session, built from the transcript Anthra already reads: your prompt, the answer, and a
+              card for every tool Claude ran. <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>J</kbd>, the switch in the header or
+              the tab’s menu change the view, and nothing restarts — there is nothing else to restart.
+            </p>
+          </div>
+
+          <div class="talk-grid">
+            <div class="cv" data-reveal aria-hidden="true">
+              <div class="cv-top">
+                <span class="badge-model">Opus 5 <i>plan</i></span>
+                <span class="cv-meta">session 00:14:02 · 41% context</span>
+                <span class="view-pick"><b>chat</b><i>terminal</i></span>
+              </div>
+
+              <div class="cv-flow">
+                <p class="cv-ask">The toast overlaps the panel on narrow windows. Fix it where the offset is decided.</p>
+
+                <div class="cv-said">
+                  <b>●</b>
+                  <p>Two places set that offset. I’ll read the panel’s width from the layout instead of the constant.</p>
+                </div>
+
+                <div class="cv-card">
+                  <div class="cv-card-h">
+                    <span class="cv-kind">Edit</span><code>src/renderer/toast.js</code>
+                    <span class="cv-count"><b class="green">+12</b> <b class="red">−4</b></span>
+                  </div>
+                  <div class="cv-hunk">
+                    <div class="cv-del"><i>142</i>− toast.style.right = '24px';</div>
+                    <div class="cv-add"><i>142</i>+ toast.style.right = px(panel.width + 24);</div>
+                  </div>
+                </div>
+
+                <div class="cv-row">
+                  <svg class="pn-chev" viewBox="0 0 8 8" width="8" height="8"><path d="m2.5 1 3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.2" /></svg>
+                  Read 3 files · Grep “toastOffset” · Glob <code>src/renderer/*.js</code>
+                </div>
+
+                <div class="cv-card is-live">
+                  <div class="cv-card-h">
+                    <span class="cv-kind">Bash</span><code>npm test -- toast</code>
+                    <span class="cv-count"><i class="cv-tick"></i>6.2s</span>
+                  </div>
+                </div>
+
+                <p class="cv-work"><span class="spin">✻</span> Working… · Esc interrupts · 6.2s</p>
+              </div>
+
+              <div class="cv-comp">
+                <div class="cv-menu">
+                  <div class="is-on"><b>/clear</b><span>Start a fresh conversation</span></div>
+                  <div><b>/compact</b><span>Summarise the session and free context</span></div>
+                  <div><b>/changelog</b><span>project · write the entry for this branch</span></div>
+                </div>
+                <div class="cv-field"><span class="accent">/</span>c<span class="caret"></span></div>
+                <div class="cv-foot">
+                  <span><b>↵</b> send · <b>⇧↵</b> new line</span><span><b>↑</b> earlier prompts</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <dl class="secs">
+                <div>
+                  <dt>A card per turn, and per tool</dt>
+                  <dd>
+                    Your prompt, the answer in markdown, and what Claude did. <em>Edit</em> and <em>Write</em> carry the diff
+                    with its line numbers and counts, and a click on the path opens the diff viewer. <em>Bash</em> carries the
+                    command, how long it took, how it ended and the last lines it printed; reads, greps and globs gather into
+                    one row, and a tool that fails says why.
+                  </dd>
+                </div>
+                <div>
+                  <dt>It fills while the turn runs</dt>
+                  <dd>
+                    A card appears when its tool starts, with a stopwatch, and closes when the tool does. A line at the bottom
+                    counts the turn up and says that <kbd>Esc</kbd> interrupts. The view stays at the end unless you scroll
+                    up, and then one button brings you back.
+                  </dd>
+                </div>
+                <div>
+                  <dt>A composer that types</dt>
+                  <dd>
+                    <kbd>Enter</kbd> sends, <kbd>Shift</kbd>+<kbd>Enter</kbd> goes to a new line. <code>/</code> lists the
+                    commands and skills with their descriptions, <code>@</code> the files of the project, <kbd>↑</kbd> and <kbd>↓</kbd>
+                    walk the prompts of this session, and a counter estimates the tokens of what you have written. What it
+                    sends is typed into Claude Code rather than pasted, so a long prompt arrives whole instead of as an
+                    attachment.
+                  </dd>
+                </div>
+                <div>
+                  <dt>The terminal, when it is needed</dt>
+                  <dd>
+                    A permission, a question, a plan to approve, an interactive command like <code>/model</code>: the tab
+                    moves to the terminal by itself and takes the keyboard with it. When the prompt comes back it returns to
+                    the conversation — if it went there on its own. A terminal you chose stays, and a line in the conversation
+                    says what was asked and that it was answered there.
+                  </dd>
+                </div>
+              </dl>
+              <p class="fine">
+                Resuming a chat shows the last 30 turns, with <em>load earlier turns</em> at the top, and a long session opens
+                without keeping you waiting. Compactions, <code>/clear</code> and every change of model or permission mode are
+                separators in the flow. New tabs open on the conversation; Preferences → Conversation changes that and stops
+                the terminal coming forward on its own, and Preferences → Appearance hides the frame around the session, both
+                halves of it: the header above the view and the shortcut bar under it.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -634,6 +757,17 @@
               </dd>
             </div>
             <div>
+              <dt><code>/</code></dt>
+              <dd>
+                the name and description of the commands and skills the composer lists: Claude Code’s own, the project’s,
+                yours and those of your enabled plugins. Read to be listed, never run.
+              </dd>
+            </div>
+            <div>
+              <dt><code>@</code></dt>
+              <dd>the files of the project, as <code>git ls-files</code> lists them, so the composer can complete a path.</dd>
+            </div>
+            <div>
               <dt><code>git</code></dt>
               <dd>
                 the status of each tab’s directory. With tasks, and only on your action, worktrees, branches and merges in
@@ -668,6 +802,22 @@
                   The status line script ships with Anthra. It sends what Claude Code hands it to <code>127.0.0.1</code> and
                   nowhere else, then runs your own status line as before. That is where Plan limits come from: on by default,
                   off in Preferences → Panel.
+                </p>
+              </div>
+            </details>
+            <details>
+              <summary>Is the conversation a second Claude?</summary>
+              <div class="faq-body">
+                <p>
+                  No. There is one session per tab, and it is Claude Code running in that tab’s terminal. The conversation is
+                  drawn from the transcript that session writes, so both views show the same turns, the same tools and the
+                  same cost.
+                </p>
+                <p>
+                  What you send from the composer is typed into that terminal as if you had typed it there, which is why
+                  <kbd>Esc</kbd>, <kbd>Shift</kbd>+<kbd>Tab</kbd> and <kbd>Ctrl</kbd>+<kbd>C</kbd> reach Claude Code as the
+                  keys they are. Permissions, plans and anything else only its own screen can draw are answered in the
+                  terminal, and the tab goes there to ask.
                 </p>
               </div>
             </details>
