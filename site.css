@@ -266,6 +266,77 @@ em {
     opacity 0.25s,
     transform 0.4s var(--ease-out);
 }
+/* Coming soon: a tag in the accent, its dot beating like a tab at work. Solid, so it can sit on a border. */
+.soon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px 4px 8px;
+  border: 1px solid var(--accent-line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 14%, var(--bg));
+  color: var(--accent);
+  font: 500 11px/1 var(--mono);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.soon::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.js.motion .soon::before {
+  animation: tick 1.9s var(--ease-out) infinite;
+}
+.soon-mini {
+  gap: 5px;
+  margin-left: 6px;
+  padding: 3px 7px 3px 6px;
+  font-size: 10px;
+  vertical-align: 1px;
+}
+.soon-mini::before {
+  width: 5px;
+  height: 5px;
+}
+
+/* The winget line: shown, not offered, with the tag set on its top edge like a label on a box. */
+.cmd.is-soon {
+  position: relative;
+  padding-right: 18px;
+  color: var(--text-dim);
+  cursor: default;
+}
+.cmd.is-soon:hover {
+  border-color: var(--border);
+  background: var(--surface);
+}
+.cmd.is-soon .cmd-prompt {
+  color: var(--text-faint);
+}
+.cmd.is-soon .soon {
+  position: absolute;
+  top: 0;
+  right: 14px;
+  transform: translateY(-50%);
+}
+.line.is-soon {
+  flex-wrap: wrap;
+  row-gap: 10px;
+}
+.line.is-soon code {
+  color: var(--text-dim);
+}
+.line.is-soon .ps {
+  color: var(--text-faint);
+}
+.line .soon {
+  margin-left: auto;
+}
+
 .i-check {
   color: var(--green);
   opacity: 0;
@@ -358,7 +429,7 @@ em {
 
 .story {
   position: relative;
-  height: 560vh;
+  height: 640vh;
 }
 
 .stage {
@@ -590,6 +661,29 @@ h1 {
 
 /* ---------- The window ---------- */
 
+/* Set every frame on the element that uses them: registered so they do not cascade into the
+   hundreds of nodes inside each layer. */
+@property --lz {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+@property --s {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+@property --lo {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+@property --solid {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 1;
+}
+
 .win {
   --z: 0;
   position: absolute;
@@ -610,7 +704,6 @@ h1 {
   transform: translateZ(var(--lz, 0px));
   transform-style: preserve-3d;
   transition:
-    opacity 0.5s var(--ease-out),
     box-shadow 0.5s var(--ease-out),
     border-color 0.5s;
   backface-visibility: hidden;
@@ -664,16 +757,49 @@ h1 {
   background: var(--accent-soft);
   color: var(--accent);
 }
+.tb-gear {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  color: var(--text-dim);
+}
 .tb-ctl {
   display: flex;
   gap: 26px;
-  margin-left: 18px;
+  margin-left: 12px;
   color: var(--text-dim);
+}
+
+/* The frame's other half: the header over the session, model to view switch. */
+.subbar {
+  position: absolute;
+  top: 68px;
+  left: 0;
+  width: 880px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 32px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--border-soft);
+  color: var(--text-faint);
+  font-size: 12px;
+}
+.subbar .badge-model {
+  margin-right: auto;
+}
+.sb-meta b {
+  color: var(--text-dim);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
 }
 
 .hintbar {
   position: absolute;
-  inset: auto 0 0;
+  bottom: 0;
+  left: 0;
+  width: 880px;
   display: flex;
   gap: 14px;
   height: 26px;
@@ -683,6 +809,7 @@ h1 {
   color: var(--text-faint);
   font-size: 11px;
   white-space: nowrap;
+  overflow: hidden;
 }
 .hintbar b {
   color: var(--accent-dim);
@@ -695,6 +822,7 @@ h1 {
 /* Every raised layer becomes a plate when exploded. */
 .l-tabs,
 .l-term,
+.l-conv,
 .l-panel {
   border: 1px solid transparent;
   border-radius: 8px;
@@ -706,14 +834,15 @@ h1 {
   background: var(--bg);
   box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.55);
 }
+.is-exploded .l-conv {
+  border-color: var(--border);
+  box-shadow: 0 30px 50px -20px rgba(0, 0, 0, calc(0.55 * var(--solid, 1)));
+}
 .is-exploded .layer.is-lit {
   border-color: var(--accent-line);
   box-shadow:
     0 40px 60px -24px rgba(0, 0, 0, 0.6),
     0 0 0 1px var(--accent-line);
-}
-.is-exploded .layer.is-dim {
-  opacity: 0.45;
 }
 
 .l-tabs {
@@ -798,53 +927,51 @@ h1 {
   }
 }
 
-.l-term {
-  top: 68px;
+.l-term,
+.l-conv {
+  top: 100px;
   left: 0;
   bottom: 26px;
   width: 880px;
-  display: flex;
-  flex-direction: column;
   border-radius: 0;
 }
-.is-exploded .l-term {
+.l-term {
+  display: flex;
+  flex-direction: column;
+}
+.is-exploded .l-term,
+.is-exploded .l-conv {
   border-radius: 8px;
 }
-.term-top {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  height: 32px;
-  padding: 0 12px;
-  border-bottom: 1px solid var(--border-soft);
-  color: var(--text-faint);
-  font-size: 12px;
-}
 
-/* The switch between the two views of one session, in the window and in the glimpse. */
+/* The switch between the two views of one session, in the window and in the glimpse, drawn as the app draws it. */
 .view-pick {
   display: inline-flex;
-  gap: 2px;
+  flex: none;
   margin-left: auto;
-  padding: 2px;
+  overflow: hidden;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 999px;
   font-size: 11px;
-  line-height: 1.45;
+  line-height: 1.7;
 }
-.view-pick b,
-.view-pick i {
-  padding: 0 7px;
-  border-radius: 4px;
+.view-pick > * {
+  padding: 0 9px;
+  color: var(--text-faint);
   font-style: normal;
   font-weight: 400;
+  transition:
+    background-color 0.35s var(--ease-out),
+    color 0.35s var(--ease-out);
 }
-.view-pick b {
-  background: var(--surface-3);
-  color: var(--text);
+.view-pick b,
+.win[data-view='chat'] [data-v='chat'],
+.win[data-view='terminal'] [data-v='terminal'] {
+  background: var(--accent-soft);
+  color: var(--accent);
 }
-.view-pick i {
-  color: var(--text-faint);
+.subbar .view-pick {
+  margin-left: 0;
 }
 
 .badge-model {
@@ -860,21 +987,37 @@ h1 {
   color: var(--cyan);
   font-style: normal;
 }
+/* Output runs from the top until the screen is full, then scrolls: the newest line stays in view. */
+.term-body,
+.cl-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 0;
+  overflow: hidden;
+}
 .term-body {
   flex: 1;
-  padding: 22px 18px 0;
-  overflow: hidden;
+  padding: 0 18px;
+}
+.term-scroll,
+.cl-scroll {
+  flex: none;
+  min-height: 100%;
+}
+.term-scroll {
+  padding-top: 20px;
 }
 .cc-head {
   display: flex;
   gap: 18px;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 24px;
   line-height: 1.55;
 }
 .cc-prompt {
   min-height: 24px;
-  margin: 0 -8px 18px;
+  margin: 0 -8px 14px;
   padding: 2px 8px;
   background: var(--surface-2);
   font-weight: 600;
@@ -897,16 +1040,15 @@ h1 {
   display: flex;
   gap: 10px;
   max-width: 820px;
-  margin: 0 0 16px 8px;
-  opacity: 1;
-  transform: none;
-  transition:
-    opacity 0.4s var(--ease-out),
-    transform 0.5s var(--ease-out);
+  margin: 0 0 14px 8px;
 }
-.cc-line.is-hidden {
-  opacity: 0;
-  transform: translateY(6px);
+.cc-line b {
+  font-weight: 700;
+}
+.cc-sub {
+  display: block;
+  padding-left: 4px;
+  color: var(--text-dim);
 }
 .bullet {
   color: var(--text);
@@ -921,6 +1063,12 @@ h1 {
   padding: 0 10px 8px;
   font-size: 12.5px;
 }
+.term-line {
+  white-space: nowrap;
+}
+.term-line .caret {
+  margin: 0 6px 0 0;
+}
 .term-input > div {
   padding: 5px 0;
 }
@@ -930,10 +1078,298 @@ h1 {
   background: var(--border);
 }
 
+/* The conversation plate: the app's own view of the turn, over the terminal. --solid and --ink
+   thin it to a pane of glass when the story looks at the terminal underneath. */
+.l-conv {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  background: rgb(23 23 27 / var(--solid, 1));
+}
+.l-conv > * {
+  opacity: var(--ink, 1);
+}
+.cl-list {
+  padding: 0 20px;
+}
+.cl-scroll {
+  padding: 12px 0 6px;
+}
+.cl-turn {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 10px 3px 14px;
+}
+.cl-turn + .cl-turn {
+  border-top: 1px solid var(--border-soft);
+}
+.cl-prompt {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+.cl-prompt p {
+  max-width: 86%;
+  margin: 0;
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px 10px 2px 10px;
+  background: var(--surface-2);
+}
+.cl-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.cl-md {
+  margin: 0;
+  line-height: 1.7;
+}
+.cl-md code {
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  font-size: 1em;
+}
+.cl-run {
+  padding: 0 10px;
+  color: var(--text-dim);
+}
+/* The panel's disclosure mark, closed. */
+.cl-run::before {
+  content: '';
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+  border-left: 3.5px solid transparent;
+  border-right: 3.5px solid transparent;
+  border-top: 4px solid currentColor;
+  transform: rotate(-90deg);
+}
+.cl-card {
+  overflow: hidden;
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  background: var(--surface);
+  transition: border-color 0.5s var(--ease-out);
+}
+.cl-card.is-running {
+  border-color: var(--accent-line);
+}
+.cl-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  background: var(--surface-2);
+}
+.cl-head b {
+  font-weight: 600;
+}
+.cl-target {
+  color: var(--text-dim);
+}
+.cl-counts {
+  display: inline-flex;
+  gap: 6px;
+  margin-left: auto;
+  font-size: 11px;
+}
+.cl-meta {
+  min-width: 34px;
+  color: var(--text-dim);
+  font-size: 11px;
+  text-align: right;
+}
+.cl-counts.is-off + .cl-meta {
+  margin-left: auto;
+}
+.cl-card.is-running .cl-meta {
+  color: var(--accent);
+}
+.cl-card.is-running .cl-meta::after {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-left: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  vertical-align: middle;
+  animation: tab-pulse 1.4s var(--ease-out) infinite;
+}
+/* The diff opens when the edit lands. */
+.cl-diff {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.6s var(--ease-out);
+}
+.cl-card.is-done .cl-diff {
+  grid-template-rows: 1fr;
+}
+.cl-diff > div {
+  min-height: 0;
+  overflow: hidden;
+}
+.cl-diff p {
+  display: grid;
+  grid-template-columns: 34px 34px 18px minmax(0, 1fr);
+  margin: 0;
+  font-size: 12px;
+  line-height: 19px;
+  white-space: pre;
+}
+.cl-diff p:first-child {
+  border-top: 1px solid var(--border-soft);
+}
+.cl-diff i {
+  padding-right: 8px;
+  color: var(--text-faint);
+  font-style: normal;
+  text-align: right;
+}
+.cl-diff i:nth-child(3) {
+  padding: 0;
+  color: inherit;
+  text-align: center;
+}
+.cl-diff .d-del {
+  background: rgba(224, 108, 117, 0.13);
+}
+.cl-diff .d-add {
+  background: rgba(110, 192, 138, 0.12);
+}
+.cl-foot {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  color: var(--text-dim);
+  font-size: 11px;
+}
+.cl-working {
+  color: var(--accent);
+}
+.cl-hint {
+  color: var(--text-faint);
+}
+/* Words arrive in place: the answer wraps once, where it will end up. */
+[data-c-answer] > span {
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-out);
+}
+[data-c-answer] > span.on {
+  opacity: 1;
+}
+
+.cl-comp {
+  display: grid;
+  gap: 5px;
+  padding: 0 20px 10px;
+}
+.cl-box {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 7px 7px 12px;
+  border: 1px solid var(--accent-line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.cl-field {
+  overflow: hidden;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.cl-caret {
+  display: inline-block;
+  width: 1.5px;
+  height: 15px;
+  margin: 0 1px;
+  vertical-align: -3px;
+  background: var(--text);
+  animation: blink 1.05s steps(1) infinite;
+}
+.cl-ph {
+  color: var(--text-dim);
+}
+.cl-send {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text-faint);
+  transition:
+    background-color 0.16s var(--ease-out),
+    color 0.16s var(--ease-out),
+    transform 0.16s var(--ease-out);
+}
+.cl-send.is-ready {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.cl-send.is-pressed {
+  transform: scale(0.88);
+}
+.cl-cfoot {
+  display: flex;
+  justify-content: flex-end;
+  min-height: 16px;
+  padding: 0 4px;
+  color: var(--text-dim);
+  font-size: 11px;
+}
+
+/* What the turn adds, it adds from below; when the demo starts over, the turn fades first. */
+.win .is-off {
+  display: none;
+}
+.cl-turn,
+.t-turn {
+  transition: opacity 0.45s var(--ease-out);
+}
+.win .is-leaving {
+  opacity: 0;
+}
+.js.motion .win [data-t-prompt],
+.js.motion .win [data-t-read],
+.js.motion .win [data-t-edit],
+.js.motion .win [data-t-edited],
+.js.motion .win [data-t-answer],
+.js.motion .win [data-t-done],
+.js.motion .win [data-c-ask],
+.js.motion .win [data-c-read],
+.js.motion .win [data-c-edit],
+.js.motion .win [data-c-answer],
+.js.motion .win [data-c-foot] {
+  animation: arrive 0.5s var(--ease-out) both;
+}
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* Leader lines: a hairline from each raised corner down to the frame, standing up out of its plane. */
+.lead {
+  position: absolute;
+  width: 1px;
+  height: 100px;
+  margin-left: -0.5px;
+  background: linear-gradient(rgba(155, 140, 247, 0), rgba(155, 140, 247, 0.55));
+  transform-origin: 50% 0;
+  transform: rotateX(90deg) scaleY(var(--s, 0));
+  opacity: var(--lo, 0);
+  pointer-events: none;
+}
+
 .l-panel {
   top: 68px;
   right: 0;
-  bottom: 26px;
+  bottom: 0;
   width: 320px;
   border-left-color: var(--border-soft);
   border-radius: 0;
@@ -1061,15 +1497,6 @@ h1 {
   display: block;
   width: 100%;
   height: 36px;
-}
-.git {
-  padding: 1px 0;
-  color: var(--text);
-}
-.git b {
-  display: inline-block;
-  width: 14px;
-  font-weight: 400;
 }
 .chat {
   display: grid;
@@ -2494,6 +2921,9 @@ details[open]::details-content {
   opacity: 1;
   transform: none;
 }
+:is(.is-static, html:not(.js)) .lead {
+  display: none;
+}
 :is(.is-static, html:not(.js)) .stage {
   display: flex;
   flex-direction: column;
@@ -2608,6 +3038,7 @@ details[open]::details-content {
   .hero-actions {
     flex-direction: column;
     align-items: stretch;
+    row-gap: 20px;
   }
   .btn,
   .cmd {
@@ -2687,6 +3118,21 @@ details[open]::details-content {
   }
   .line {
     font-size: 13.5px;
+  }
+  .console-tabs button {
+    padding-inline: 12px;
+  }
+  /* Four tabs fill a phone: the winget tag keeps its dot and says "soon" to screen readers only. */
+  .soon-mini {
+    padding: 3px;
+  }
+  .soon-mini > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
   .console-panel {
     padding: 22px 16px;

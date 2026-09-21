@@ -37,26 +37,56 @@
   const note = $('[data-note]');
   const captions = $$('.caption');
   const railButtons = $$('[data-goto]');
-  const layers = {
-    frame: $('[data-layer="frame"]'),
-    steps: [0, 1, 2, 3].map((i) => $(`[data-layer="${i}"]`)),
-  };
+  const hintView = $('[data-hint-view]');
 
-  // Stacking order from the floor up: frame, terminal, panel, tabs, toast.
-  const LIFT = { frame: 0, 1: 1, 2: 2, 0: 3, 3: 4.2 };
+  // The steps, in the order the captions tell them.
+  const STEPS = ['tabs', 'conv', 'term', 'panel', 'toast'];
+  const N = STEPS.length;
+  const plates = Object.fromEntries(['frame', ...STEPS].map((k) => [k, $(`[data-layer="${k}"]`)]));
+  const leads = STEPS.map((k) => $$(`[data-lead="${k}"]`));
 
-  const STEP_START = 0.36;
+  // Height above the frame, in gaps: the terminal sits lowest, the conversation right over it.
+  const LIFT = { term: 1, conv: 2, panel: 1.5, tabs: 3, toast: 4 };
+  // What the camera leans towards when a step is lit, in window pixels.
+  const FOCUS = { tabs: [600, 52], conv: [440, 380], term: [440, 420], panel: [1040, 380], toast: [1008, 650] };
+
+  const STEP_START = 0.34;
   const STEP_END = 0.95;
+
+  // How far the exploded stack reaches left and right of its centre, in window widths at its scale.
+  const REACH_L = 0.6;
+  const REACH_R = 0.76;
 
   let pinned = false;
   let heroBottom = 0;
-  let current = -2;
+  let captionsRight = 0;
+  let shownCaption = -2;
+  let view = 'chat';
+
+  // Style writes skip values that have not changed: most frames of the story move only a few of them.
+  let written = new Map();
+  function put(el, prop, value) {
+    let seen = written.get(el);
+    if (!seen) written.set(el, (seen = {}));
+    if (seen[prop] === value) return;
+    seen[prop] = value;
+    if (prop.startsWith('--')) el.style.setProperty(prop, value);
+    else el.style[prop] = value;
+  }
 
   function isStatic() {
     return reducedQuery.matches || smallQuery.matches;
   }
 
+  function setView(next) {
+    if (next === view) return;
+    view = next;
+    win.dataset.view = next;
+    hintView.textContent = next === 'chat' ? 'terminal' : 'conversation';
+  }
+
   function measure() {
+    written = new Map();
     pinned = !isStatic();
     root.classList.toggle('is-static', !pinned);
     stage.classList.remove('is-exploded');
@@ -67,6 +97,7 @@
     const heroRect = hero.getBoundingClientRect();
     const stageRect = stage.getBoundingClientRect();
     heroBottom = heroRect.bottom - stageRect.top;
+    captionsRight = $('[data-captions]').getBoundingClientRect().right;
     update();
   }
 
@@ -76,11 +107,18 @@
     viewport.style.setProperty('--vh-static', `${Math.round(H * s)}px`);
     win.style.transform = `scale(${s})`;
     win.style.transformOrigin = '0 0';
-    for (const el of [layers.frame, ...layers.steps]) {
+    // What the pinned story set on the hero would outlive it here.
+    for (const prop of ['opacity', 'transform', 'visibility']) hero.style[prop] = '';
+    for (const el of Object.values(plates)) {
       el.style.setProperty('--lz', '0px');
-      el.classList.remove('is-lit', 'is-dim');
+      el.style.opacity = '';
+      el.classList.remove('is-lit');
     }
+    plates.conv.style.removeProperty('--solid');
+    plates.conv.style.removeProperty('--ink');
+    setView('chat');
     captions.forEach((c) => c.classList.remove('is-active'));
+    shownCaption = -2;
   }
 
   function progress() {
@@ -88,6 +126,15 @@
     const travel = rect.height - innerHeight;
     return travel > 0 ? clamp(-rect.top / travel) : 0;
   }
+
+  // How lit step i is at position u (0..N along the steps): full across its middle, crossfading at the edges.
+  function weight(u, i) {
+    const d = Math.abs(u - (i + 0.5));
+    return smooth(clamp(1 - (d - 0.3) / 0.4));
+  }
+
+  // The pointer leans the exploded window a little, eased.
+  const lean = { x: 0, y: 0, tx: 0, ty: 0 };
 
   function update() {
     if (!pinned) return;
@@ -101,12 +148,18 @@
     const b = smooth(range(p, 0.17, STEP_START));
     // Phase C: one layer at a time.
     const c = range(p, STEP_START, STEP_END);
+    // How much the steps have taken over: rises as the layers finish separating.
+    const on = smooth(range(p, STEP_START - 0.05, STEP_START + 0.01));
 
-    hero.style.opacity = String(clamp(1 - a * 1.6));
-    hero.style.transform = `translate(-50%, ${-a * 90}px)`;
-    hero.style.visibility = a > 0.7 ? 'hidden' : 'visible';
-    note.style.setProperty('--note', String(clamp(a * 3 - 2) * clamp(1 - b * 3)));
-    stage.style.setProperty('--grid', String(0.35 + b * 0.5));
+    put(hero, 'opacity', clamp(1 - a * 1.6).toFixed(3));
+    put(hero, 'transform', `translate(-50%, ${(-a * 90).toFixed(1)}px)`);
+    put(hero, 'visibility', a > 0.7 ? 'hidden' : 'visible');
+    put(note, '--note', (clamp(a * 3 - 2) * clamp(1 - b * 3)).toFixed(3));
+    put(stage, '--grid', (0.35 + b * 0.5).toFixed(3));
+
+    const u = clamp(c * N, 0.2, N - 0.2);
+    const w = STEPS.map((_, i) => weight(u, i) * on);
+    const lit = Object.fromEntries(STEPS.map((k, i) => [k, w[i]]));
 
     const fit = Math.min((vw - 96) / W, (vh - 150) / H, 1.08);
     const wide = vw > 1080;
@@ -116,65 +169,114 @@
     const y1 = vh / 2 + 24;
     const sA = fit * 0.94;
 
-    const sB = fit * (wide ? 0.54 : 0.5);
-    const xB = wide ? vw * 0.585 : vw * 0.5;
-    const yB = vh / 2 + 50;
+    // Exploded, the window keeps clear of the captions: as far right as its left reach needs, and
+    // smaller when the room between the captions and the edge is short.
+    const room = vw - 16 - (captionsRight + 24);
+    const sB = Math.min(fit * (wide ? 0.5 : 0.46), room / ((REACH_L + REACH_R) * W * 1.04));
+    const reach = W * sB * 1.04;
+    const xB = Math.min(Math.max(vw * 0.6, captionsRight + 24 + REACH_L * reach), vw - 16 - REACH_R * reach);
+    const yB = vh / 2 + 52;
 
-    const scale = lerp(lerp(s0, sA, a), sB, b);
+    // The camera leans towards the lit layer and comes a little closer; never left, where the captions are.
+    let fx = 0;
+    let fy = 0;
+    STEPS.forEach((k, i) => {
+      fx += w[i] * (FOCUS[k][0] - W / 2);
+      fy += w[i] * (FOCUS[k][1] - H / 2);
+    });
+    const scale = lerp(lerp(s0, sA, a), sB, b) * (1 + 0.04 * on);
     const x = lerp(vw / 2, xB, b);
     const y = lerp(lerp(y0, y1, a), yB, b);
-    const drift = c > 0 && c < 1 ? (c - 0.5) * 6 : 0;
-    const rx = lerp(26, 0, a) + b * 48;
-    const rz = b * (-24 + drift);
+    const drift = (c - 0.5) * 6 * on;
+    const rx = lerp(26, 0, a) + b * 50;
+    const rz = b * (-26 + drift);
 
-    win.style.transformOrigin = '50% 50%';
-    win.style.transform =
-      `translate3d(${x - W / 2}px, ${y - H / 2}px, 0) scale(${scale}) ` +
-      `rotateX(${rx}deg) rotateZ(${rz}deg)`;
+    put(win, 'transformOrigin', '50% 50%');
+    put(
+      win,
+      'transform',
+        `translate3d(${(x - W / 2).toFixed(1)}px, ${(y - H / 2).toFixed(1)}px, 0) ` +
+        `rotateY(${(lean.x * 5 * b).toFixed(3)}deg) rotateX(${(-lean.y * 4 * b).toFixed(3)}deg) ` +
+        `scale(${scale.toFixed(4)}) rotateX(${rx.toFixed(2)}deg) rotateZ(${rz.toFixed(2)}deg) ` +
+        `translate3d(${(-Math.min(0, fx) * 0.14).toFixed(1)}px, ${(-fy * 0.24).toFixed(1)}px, 0)`,
+    );
 
     const exploded = b > 0.55;
     stage.classList.toggle('is-exploded', exploded);
 
-    const active = c > 0 && c < 1 ? Math.min(3, Math.floor(c * 4)) : c >= 1 ? -1 : -2;
-    const gap = 150 * b;
+    // Heights: each layer at its place in the stack, the lit one raised further. Looking at the
+    // terminal lifts the conversation off it like a lid and thins it to glass.
+    const gap = 125 * b;
+    const z = {};
+    for (const k of STEPS) z[k] = LIFT[k] * gap + 64 * lit[k];
+    z.conv += 140 * lit.term;
+    const dim = (k) => lerp(1, lerp(0.36, 1, lit[k]), on);
 
-    layers.frame.style.setProperty('--lz', '0px');
-    layers.frame.classList.toggle('is-dim', exploded && active >= 0);
-    layers.steps.forEach((el, i) => {
-      const lit = active === i;
-      const z = LIFT[i] * gap + (lit ? 90 : 0);
-      el.style.setProperty('--lz', `${z}px`);
-      el.classList.toggle('is-lit', exploded && lit);
-      el.classList.toggle('is-dim', exploded && active >= 0 && !lit);
+    put(plates.frame, '--lz', '0px');
+    put(plates.frame, 'opacity', lerp(1, 0.55, on).toFixed(3));
+    STEPS.forEach((k, i) => {
+      const el = plates[k];
+      put(el, '--lz', `${z[k].toFixed(1)}px`);
+      put(el, 'opacity', k === 'conv' ? '1' : dim(k).toFixed(3));
+      el.classList.toggle('is-lit', exploded && w[i] > 0.5);
+      const lo = (b * (0.3 + 0.7 * lit[k])).toFixed(3);
+      for (const line of leads[i]) {
+        put(line, '--s', (z[k] / 100).toFixed(3));
+        put(line, '--lo', lo);
+      }
+    });
+    // The conversation dims its ink like the others; looking underneath turns it to glass, the outline
+    // kept and the fill all but gone.
+    const glass = lit.term;
+    put(plates.conv, '--solid', lerp(1, 0.04, glass).toFixed(3));
+    put(plates.conv, '--ink', lerp(dim('conv'), 0.07, glass).toFixed(3));
+    setView(glass > 0.5 ? 'terminal' : 'chat');
+
+    let active = -1;
+    w.forEach((v, i) => {
+      if (v > 0.5) active = i;
     });
 
     // Rail fill per step.
     railButtons.forEach((btn, i) => {
-      const fill = clamp(c * 4 - i);
-      btn.style.setProperty('--fill', fill.toFixed(3));
+      put(btn, '--fill', clamp(c * N - i).toFixed(3));
       btn.setAttribute('aria-current', String(active === i));
     });
 
-    const shown = !exploded ? -2 : active === -1 ? 3 : active;
-    if (shown !== current) {
-      current = shown;
+    const shown = exploded ? (active >= 0 ? active : c >= 1 ? N - 1 : 0) : -2;
+    if (shown !== shownCaption) {
+      shownCaption = shown;
       captions.forEach((cap, i) => cap.classList.toggle('is-active', i === shown));
     }
   }
 
-  let ticking = false;
-  addEventListener(
-    'scroll',
-    () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        ticking = false;
-        update();
-      });
-    },
-    { passive: true },
-  );
+  // One frame at a time, for the scroll and for the pointer's easing.
+  let frameId = 0;
+  function frame() {
+    frameId = 0;
+    lean.x += (lean.tx - lean.x) * 0.08;
+    lean.y += (lean.ty - lean.y) * 0.08;
+    update();
+    if (Math.abs(lean.tx - lean.x) + Math.abs(lean.ty - lean.y) > 0.002) kick();
+  }
+  function kick() {
+    if (!frameId) frameId = requestAnimationFrame(frame);
+  }
+
+  addEventListener('scroll', kick, { passive: true });
+
+  const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
+  stage.addEventListener('pointermove', (e) => {
+    if (!pinned || !finePointer.matches || e.pointerType !== 'mouse') return;
+    lean.tx = clamp(e.clientX / innerWidth, 0, 1) - 0.5;
+    lean.ty = clamp(e.clientY / innerHeight, 0, 1) - 0.5;
+    kick();
+  });
+  stage.addEventListener('pointerleave', () => {
+    lean.tx = 0;
+    lean.ty = 0;
+    kick();
+  });
 
   let resizeTimer;
   addEventListener('resize', () => {
@@ -192,23 +294,51 @@
     btn.addEventListener('click', () => {
       const i = Number(btn.dataset.goto);
       const travel = story.offsetHeight - innerHeight;
-      const at = STEP_START + ((i + 0.5) / 4) * (STEP_END - STEP_START);
+      const at = STEP_START + ((i + 0.5) / N) * (STEP_END - STEP_START);
       scrollTo({ top: story.offsetTop + travel * at, behavior: 'smooth' });
     });
   });
 
   /* ---------------- Live demo inside the window ---------------- */
 
+  // One turn, shown twice: the conversation builds it from the transcript while Claude Code
+  // prints it in the terminal underneath.
   const demo = (() => {
     const el = {
-      typed: $('[data-typed]'),
-      caret: $('[data-caret]'),
-      read: $('[data-step-out="read"]'),
-      answerLine: $('[data-step-out="answer"]'),
-      answer: $('[data-answer]'),
-      done: $('[data-step-out="done"]'),
+      // Conversation
+      cTurn: $('[data-c-turn]'),
+      ask: $('[data-c-ask]'),
+      cRead: $('[data-c-read]'),
+      edit: $('[data-c-edit]'),
+      counts: $('[data-c-counts]'),
+      meta: $('[data-c-meta]'),
+      answer: $('[data-c-answer]'),
+      words: $$('[data-c-answer] > span'),
+      foot: $('[data-c-foot]'),
+      working: $('[data-c-working]'),
+      hint: $('[data-c-hint]'),
+      secs: $('[data-c-secs]'),
+      typed: $('[data-c-typed]'),
+      ph: $('[data-c-ph]'),
+      send: $('[data-c-send]'),
+      tokens: $('[data-c-tokens]'),
+      // Terminal
+      tTurn: $('[data-t-turn]'),
+      tPrompt: $('[data-t-prompt]'),
+      tSaid: $('[data-t-said]'),
+      tRead: $('[data-t-read]'),
+      tEdit: $('[data-t-edit]'),
+      tEdited: $('[data-t-edited]'),
+      tAnswer: $('[data-t-answer]'),
+      tWords: $('[data-t-words]'),
+      tDone: $('[data-t-done]'),
+      tSecs: $('[data-t-secs]'),
+      tInput: $('[data-t-input]'),
+      tPh: $('[data-t-ph]'),
+      // Around them
       ring: $('[data-ring]'),
       pct: $('[data-pct]'),
+      sbPct: $('[data-sb-pct]'),
       ctxk: $('[data-ctxk]'),
       lim: $('[data-lim]'),
       limBar: $('[data-lim-bar]'),
@@ -217,14 +347,16 @@
       trend: $('[data-trend]'),
       forecast: $('[data-forecast]'),
       turn: $('[data-turn]'),
+      add: $('[data-add]'),
+      del: $('[data-del]'),
+      dirty: $('[data-dirty]'),
       toast: $('[data-toast]'),
       dots: $$('[data-dot]'),
       clocks: [$('[data-clock]'), $('[data-clock-2]')],
     };
 
     const PROMPT = 'Make the hero window straighten as the page scrolls.';
-    const ANSWER =
-      'Added a scroll-linked transform in site.js: the window starts tilted back, settles flat as the headline lifts away, and stays still with prefers-reduced-motion.';
+    const ANSWER = el.words.map((w) => w.textContent).join(' ');
     const CURVE_A = 'M0 34 L40 33 L80 31 L120 30 L150 22 L175 26 L200 18 L220 16';
     const CURVE_B = 'M0 34 L40 33 L80 31 L120 30 L150 22 L175 26 L200 18 L220 6';
     // Context after each turn, with one compaction; the finished turn adds the last point.
@@ -237,11 +369,16 @@
     let run = 0;
     let visible = true;
     let seconds = 161;
+    // Time that has passed on screen: the turn's stopwatch counts only this.
+    let shownMs = 0;
 
     const state = { ...START };
 
+    const off = (node, hidden) => node.classList.toggle('is-off', hidden);
+
     function render() {
       el.pct.textContent = Math.round(state.pct);
+      el.sbPct.textContent = `${Math.round(state.pct)}%`;
       el.ctxk.textContent = Math.round(state.ctx);
       el.ring.setAttribute('stroke-dasharray', `${state.pct.toFixed(1)} 100`);
       el.lim.textContent = Math.round(state.lim);
@@ -256,15 +393,44 @@
       el.turn.textContent = done ? '12' : '11';
     }
 
+    function edited(done) {
+      el.add.textContent = done ? '+216' : '+214';
+      el.del.textContent = done ? '−39' : '−38';
+      off(el.dirty, !done);
+    }
+
+    function compose(text) {
+      el.typed.textContent = text;
+      off(el.ph, text.length > 0);
+      el.send.classList.toggle('is-ready', text.length > 0);
+      // The composer's estimate: about four characters to a token.
+      el.tokens.textContent = text ? `~${Math.max(1, Math.round(text.length / 4))} token` : '';
+    }
+
+    function termInput(text) {
+      el.tInput.textContent = text;
+      off(el.tPh, text.length > 0);
+    }
+
+    function stopwatch(ms) {
+      const s = Math.floor(ms / 1000);
+      el.secs.textContent = `${s} s`;
+      return s;
+    }
+
     // Sleeps that pause while the window is off screen and die on restart.
-    function wait(ms, id) {
+    function wait(ms, id, onTick) {
       return new Promise((resolve, reject) => {
         let left = ms;
         let last = performance.now();
         const tick = (now) => {
           if (id !== run) return reject(new Error('stopped'));
-          if (visible && !document.hidden) left -= now - last;
+          if (visible && !document.hidden) {
+            left -= now - last;
+            shownMs += now - last;
+          }
           last = now;
+          onTick?.();
           if (left <= 0) resolve();
           else requestAnimationFrame(tick);
         };
@@ -296,14 +462,25 @@
     function reset() {
       Object.assign(state, START);
       render();
-      el.typed.textContent = '';
-      el.answer.textContent = '';
-      el.caret.hidden = false;
-      el.read.classList.add('is-hidden');
-      el.answerLine.classList.add('is-hidden');
-      el.done.classList.add('is-hidden');
+      el.cTurn.classList.remove('is-leaving');
+      el.tTurn.classList.remove('is-leaving');
+      off(el.cTurn, true);
+      for (const n of [el.ask, el.cRead, el.edit, el.counts, el.answer, el.foot]) off(n, true);
+      for (const n of [el.tPrompt, el.tRead, el.tEdit, el.tEdited, el.tAnswer, el.tDone]) off(n, true);
+      el.edit.classList.remove('is-running', 'is-done');
+      el.meta.textContent = '';
+      el.words.forEach((w) => w.classList.remove('on'));
+      off(el.working, false);
+      off(el.hint, false);
+      el.secs.textContent = '0 s';
+      el.tSaid.textContent = '';
+      el.tWords.textContent = '';
+      compose('');
+      termInput('');
       el.toast.classList.remove('is-shown');
       turnEnd(false);
+      edited(false);
+      delete el.dots[0].dataset.status;
       el.dots[1].dataset.status = 'unread';
       el.dots[2].dataset.status = 'working';
     }
@@ -311,52 +488,111 @@
     function finalState() {
       Object.assign(state, END);
       render();
-      el.typed.textContent = PROMPT;
-      el.answer.textContent = ANSWER;
-      el.caret.hidden = true;
-      el.read.classList.remove('is-hidden');
-      el.answerLine.classList.remove('is-hidden');
-      el.done.classList.remove('is-hidden');
+      el.cTurn.classList.remove('is-leaving');
+      el.tTurn.classList.remove('is-leaving');
+      off(el.cTurn, false);
+      for (const n of [el.ask, el.cRead, el.edit, el.counts, el.answer, el.foot]) off(n, false);
+      for (const n of [el.tPrompt, el.tRead, el.tEdit, el.tEdited, el.tAnswer, el.tDone]) off(n, false);
+      el.edit.classList.remove('is-running');
+      el.edit.classList.add('is-done');
+      el.meta.textContent = '0.1 s';
+      el.words.forEach((w) => w.classList.add('on'));
+      off(el.working, true);
+      off(el.hint, true);
+      el.secs.textContent = '9 s';
+      el.tSecs.textContent = '9';
+      el.tSaid.textContent = PROMPT;
+      el.tWords.textContent = ANSWER;
+      compose('');
+      termInput('');
       el.toast.classList.add('is-shown');
       turnEnd(true);
+      edited(true);
+      delete el.dots[0].dataset.status;
       el.dots[1].dataset.status = 'waiting';
-      el.dots[2].dataset.status = 'unread';
+      el.dots[2].dataset.status = 'working';
     }
 
     async function loop(id) {
       while (id === run) {
         reset();
-        await wait(1400, id);
+        await wait(1200, id);
+
+        // Written in the composer…
         for (let i = 1; i <= PROMPT.length; i++) {
-          el.typed.textContent = PROMPT.slice(0, i);
-          await wait(PROMPT[i - 1] === ' ' ? 70 : 28 + Math.random() * 40, id);
+          compose(PROMPT.slice(0, i));
+          await wait(PROMPT[i - 1] === ' ' ? 70 : 26 + Math.random() * 40, id);
         }
-        await wait(500, id);
-        el.caret.hidden = true;
-        el.dots[2].dataset.status = 'working';
-        await wait(700, id);
-        el.read.classList.remove('is-hidden');
+        await wait(420, id);
+        el.send.classList.add('is-pressed');
+        await wait(140, id);
+        el.send.classList.remove('is-pressed');
+        compose('');
+
+        // …typed into Claude Code, keystroke by keystroke, then entered.
+        for (let i = 1; i <= PROMPT.length; i += 3) {
+          termInput(PROMPT.slice(0, i + 2));
+          await wait(16, id);
+        }
+        await wait(120, id);
+        termInput('');
+        el.tSaid.textContent = PROMPT;
+        off(el.tPrompt, false);
+        off(el.cTurn, false);
+        off(el.ask, false);
+        off(el.foot, false);
+        el.dots[0].dataset.status = 'working';
+        const started = shownMs;
+        const clock = () => stopwatch(shownMs - started);
+
+        await wait(800, id, clock);
+        off(el.cRead, false);
+        off(el.tRead, false);
         await tween({ pct: 61, ctx: 122, cost: 0.07, lim: 32 }, 900, id);
-        await wait(600, id);
-        el.answerLine.classList.remove('is-hidden');
-        const words = ANSWER.split(' ');
-        let text = '';
+
+        await wait(300, id, clock);
+        el.edit.classList.add('is-running');
+        el.meta.textContent = 'running';
+        off(el.edit, false);
+        off(el.tEdit, false);
+        await wait(1100, id, clock);
+        el.edit.classList.remove('is-running');
+        el.edit.classList.add('is-done');
+        el.meta.textContent = '0.1 s';
+        off(el.counts, false);
+        off(el.tEdited, false);
+        edited(true);
+
+        await wait(900, id, clock);
+        off(el.answer, false);
+        off(el.tAnswer, false);
         const grow = tween(END, 2600, id);
-        for (const w of words) {
-          text += (text ? ' ' : '') + w;
-          el.answer.textContent = text;
-          await wait(45 + Math.random() * 45, id);
+        let text = '';
+        for (const w of el.words) {
+          w.classList.add('on');
+          text += (text ? ' ' : '') + w.textContent;
+          el.tWords.textContent = text;
+          await wait(50 + Math.random() * 50, id, clock);
         }
         await grow;
+
+        const secs = Math.max(1, clock());
+        off(el.working, true);
+        off(el.hint, true);
+        el.tSecs.textContent = String(secs);
+        off(el.tDone, false);
         turnEnd(true);
-        el.done.classList.remove('is-hidden');
-        el.dots[2].dataset.status = 'unread';
+        delete el.dots[0].dataset.status;
+
         await wait(1300, id);
         el.dots[1].dataset.status = 'waiting';
         el.toast.classList.add('is-shown');
         await wait(4200, id);
         el.toast.classList.remove('is-shown');
-        await wait(2400, id);
+        await wait(2200, id);
+        el.cTurn.classList.add('is-leaving');
+        el.tTurn.classList.add('is-leaving');
+        await wait(500, id);
       }
     }
 
