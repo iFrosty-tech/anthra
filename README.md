@@ -60,11 +60,12 @@ and ideas in [Issues](https://github.com/iFrosty-tech/anthra/issues).
 | How | Command or link | Updates |
 | --- | --- | --- |
 | **Installer** | [`Anthra-Setup-<version>-x64.exe`](https://github.com/iFrosty-tech/anthra/releases/latest) | By itself |
-| **winget** | `winget install iFrosty-tech.Anthra` | By itself, or `winget upgrade` |
 | **Scoop** | `scoop bucket add anthra https://github.com/iFrosty-tech/anthra`<br>`scoop install anthra` | `scoop update anthra` |
 | **Portable** | [`Anthra-Portable-<version>-x64.exe`](https://github.com/iFrosty-tech/anthra/releases/latest) | Download the new one |
+| **winget** — coming soon | `winget install iFrosty-tech.Anthra`, once Anthra is in the winget repository | By itself, or `winget upgrade` |
 
-winget and Scoop are available from version 0.7.0, the first release published here.
+Scoop is available from version 0.7.0, the first release published here. winget is coming soon:
+Anthra is not in the winget repository yet.
 
 Requirements: Windows 10 or 11, and [Claude Code](https://claude.com/claude-code) on your
 `PATH`. The installer is per-user and needs no admin rights. Tasks need git on your
@@ -117,7 +118,8 @@ account.
 
 **Why does SmartScreen warn me?**
 Anthra is not code-signed yet, and SmartScreen warns about unsigned downloads it has not
-seen often. winget, Scoop and Anthra's own updates do not go through SmartScreen. To
+seen often. Scoop and Anthra's own updates do not go through SmartScreen, and neither
+will winget once Anthra is there. To
 check a download, compare its SHA-512 with the `sha512` in that release's `latest.yml`:
 
 ```powershell
@@ -130,8 +132,8 @@ API-equivalent cost of what you used. Since version 0.9.0 they also match what `
 reports inside Claude Code.
 
 **How do I remove Anthra completely?**
-Uninstall it from Windows Settings (or `winget uninstall iFrosty-tech.Anthra`,
-`scoop uninstall anthra`), then delete `%APPDATA%\Anthra`. Anthra never writes to
+Uninstall it from Windows Settings (or `scoop uninstall anthra`), then delete
+`%APPDATA%\Anthra`. Anthra never writes to
 Claude Code's own configuration. Closing a task removes its folder unless you keep it
 when opening a pull request. What can stay in your repositories are the folders of
 tasks still open or kept, in `<repository>.worktrees\<name>`, and the task branches —
