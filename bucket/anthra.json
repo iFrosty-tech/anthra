@@ -1,13 +1,13 @@
 {
-    "version": "0.10.0",
+    "version": "0.11.1",
     "description": "Windows terminal that opens straight into Claude Code, with a live session overview panel",
     "homepage": "https://ifrosty-tech.github.io/anthra/",
     "license": "MIT",
     "notes": "Anthra needs Claude Code on your PATH. Scoop keeps it up to date: run 'scoop update anthra' when Anthra says a new version is out.",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/iFrosty-tech/anthra/releases/download/v0.10.0/Anthra-Portable-0.10.0-x64.exe#/Anthra.exe",
-            "hash": "3f3f6f5942a4e2c4cabc049577c42dbc37d8fec75c0202f15cc31778539a6257"
+            "url": "https://github.com/iFrosty-tech/anthra/releases/download/v0.11.1/Anthra-Portable-0.11.1-x64.exe#/Anthra.exe",
+            "hash": "9064ff3a4c38b82921b0e8d9db1aabab49ad634e4451ba147ace64b65e71b4eb"
         }
     },
     "bin": "Anthra.exe",
